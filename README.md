@@ -2,4 +2,5 @@
 :vertical_traffic_light: Traffic analysis for TCP connections.
 
 ### TODO
-+ Parse a given TCP trace file
++ Add `pycapy` package
++ Parse the `sample_output_file` TCP trace file
