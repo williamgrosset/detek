@@ -3,10 +3,18 @@
 
 ### TODO
 + Review TCP
-  + Jot down notes on important sections of assignment
-+ Add `pcapy` package
-+ Parse the `sample_output_file` TCP trace file
-+ Parse each unique TCP connection (keep track of state)
++ Create a `HashMap<connection_id, connection_obj>`
+  + `connection_id`: 4-attribute tuple
+  + `connection_obj`: state of connection, connection_complete boolean
+    + if connection_complete:
+      + packets sent from source &rightarrow; destination
+      + packets sent from destination &rightarrow; source 
+      + total packets
+      + data bytes sent from source %rightarrow; destination
+      + data bytes sent from destination %rightarrow; source 
+      + total data bytes 
++ Parse each unique TCP connection (keep track of state) identified by a duplex tuple
++ Leave `Section D)` till last
 
 ### Setup
 1. Ensure you are running Python 3.x.
@@ -16,6 +24,7 @@
 ### Identifying a TCP connection
 + 4-tuple (IP source address, source port, IP destination address, destination port)
 + Packets can flow in both directions on a connection (duplex)
+  + `(123, 0, 456, 1)` is the same as `(456, 1, 123, 0)`
 
 ### Identifying a Complete TCP connection
 + Acknowledged both `SIN` and `FIN`
