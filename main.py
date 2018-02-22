@@ -2,8 +2,9 @@ import sys
 import pcapy
 
 def main():
-    print('Hello, world')
     pc = pcapy.open_offline(sys.argv[1])
+    pc.setfilter('tcp')
+
     data = pc.next()
     while data[0]:
         print(data)
