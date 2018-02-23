@@ -1,22 +1,24 @@
-# detect 
+# detek
 :vertical_traffic_light: TCP Traffic Analysis.
 
-### TODO
+## TODO
 + Review TCP lecture notes
 + Create a `HashMap<connection_id, connection_obj>` (TODO: algorithm needs auditing)
   + `connection_id`: 4-attribute tuple (duplex supported)
     + when adding to HashMap, check for inverse of source and destination values
-  + `connection_obj`: state of connection, connection_complete boolean (atleast 1 S1F1), connection_reset boolean
-    + if connection_complete:
-      + start and end time + duration of connection
-      + packets sent from source &rightarrow; destination
-      + packets sent from destination &rightarrow; source 
-      + total packets
-      + data bytes sent from source &rightarrow; destination
-      + data bytes sent from destination &rightarrow; source 
-      + total data bytes 
+  + `connection_obj`:
+    + state of connection 
+    + complete bool (atleast 1 `S1F1`), reset bool 
+    + start and end time + duration of connection
+    + packets sent from source &rightarrow; destination
+    + packets sent from destination &rightarrow; source 
+    + total packets
+    + data bytes sent from source &rightarrow; destination
+    + data bytes sent from destination &rightarrow; source 
+    + total data bytes 
 + Parse each packet identifying the TCP connection (keep track of state)
   + focus on a single packet
++ Grab number for all TCP connections and compare to WS
 + Complete `Section C) and D)`
 + Error handling, nit clean-up, and organize repo
 + Finish README and add example gif
@@ -31,7 +33,11 @@
 4. ...
 
 ### Strategy
-...
+1. Initialize HashMap.
+2. Parse each packet in capture file.
+  + Add unique TCP connection to HashMap.
+  + Update connection object information for each TCP connection
+3. ...
 
 #### Identifying a TCP connection
 + 4-attribute tuple (IP source address, source port, IP destination address, destination port)
