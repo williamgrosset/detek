@@ -10,7 +10,7 @@ class Connection:
         self.peer1 = peer1
         self.peer2 = peer2
 
-def callback(header, data):
+def packet_parser(header, data):
     decoder = ImpactDecoder.EthDecoder()
     ethernet_packet = decoder.decode(data)
     ip_header = ethernet_packet.child()
@@ -27,7 +27,7 @@ def main():
     pc = pcapy.open_offline(sys.argv[1])
     pc.setfilter('tcp')
 
-    pc.loop(0, callback)
+    pc.loop(0, packet_parser)
 
 if __name__ == '__main__':
     main()
