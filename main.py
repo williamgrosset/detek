@@ -18,9 +18,9 @@ def packet_parser(header, data):
 
     source = (ip_header.get_ip_src(), tcp_header.get_th_sport())
     destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
-    con = Connection(source, destination)
+    connection = Connection(source, destination)
 
-    print "Connection: %s" % (con)
+    print 'Connection: %s' % (connection)
 
 
 def main():
