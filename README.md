@@ -3,6 +3,7 @@
 
 ## TODO
 + Review TCP lecture notes
++ ~Use `impacket` to parse info for each packet~
 + Create a `HashMap<connection_id, connection_obj>` (TODO: algorithm needs auditing)
   + `connection_id`: 4-attribute tuple (duplex supported)
     + when adding to HashMap, check for inverse of source and destination values
@@ -27,10 +28,10 @@
 ...
 
 ### Usage 
-1. Ensure you are running Python 3.x.
-2. Install [pcapy](https://github.com/CoreSecurity/pcapy).
-3. `python3 main.py <capture-file>`
-4. ...
+**Prerequisite**: Python 2.7.x.
+1. Install [pcapy](https://github.com/CoreSecurity/pcapy) and [impacket](https://github.com/CoreSecurity/impacket).
+2. `python main.py <capture-file>`
+3. ...
 
 ### Strategy
 1. Initialize HashMap.

@@ -1,5 +1,6 @@
 import sys
 import pcapy
+import impacket
 
 def main():
     pc = pcapy.open_offline(sys.argv[1])
@@ -8,7 +9,7 @@ def main():
     data = pc.next()
     total_packets = 0
     while data[0]:
-        print(data)
+        # print(data)
         data = pc.next()
         total_packets += 1
 
