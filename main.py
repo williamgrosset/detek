@@ -10,6 +10,10 @@ class Connection:
         self.peer1 = peer1
         self.peer2 = peer2
 
+'''
+TODO: Class is used as the dictionary value.
+'''
+
 def packet_parser(header, data):
     decoder = ImpactDecoder.EthDecoder()
     ethernet_packet = decoder.decode(data)
@@ -24,10 +28,13 @@ def packet_parser(header, data):
 
 
 def main():
+    # TODO: Error handling for file type
+    connections = {}
     pc = pcapy.open_offline(sys.argv[1])
     pc.setfilter('tcp')
-
     pc.loop(0, packet_parser)
+
+    # TODO: Results logger
 
 if __name__ == '__main__':
     main()
