@@ -96,6 +96,7 @@ def packet_parser(header, data):
         # TODO: Identify if source or destination
         # TODO: Update packets sent/recv
         # TODO: Update total packets
+        connection_info.total_packets += 1
         # TODO: Update bytes sent/recv
         # TODO: Update total bytes
 
