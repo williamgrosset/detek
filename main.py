@@ -33,8 +33,17 @@ class ConnectionState:
         self.SYN = 0
         self.ACK = 0
         self.FIN = 0
-        self.is_complete = false
-        self.is_reset = false
+        self.is_complete = False
+        self.is_reset = False
+
+    def increment_SYN():
+        self.SYN += 1
+
+    def increment_ACK():
+        self.ACK += 1
+
+    def increment_FIN():
+        self.FIN += 1
 
 class ConnectionInfo:
     '''
@@ -63,6 +72,9 @@ def packet_parser(header, data):
     connection_id = ConnectionId(source, destination)
 
     print 'Connection: %s' % (connection_id)
+
+    connection_info = ConnectionInfo()
+    print(connection_info.state.SYN)
 
     if not connections.has_key(connection_id):
         connections[connection_id] = 'unique'
