@@ -91,21 +91,21 @@ def packet_parser(header, data):
             connection_info.state.is_complete = True
 
         # If RST flag is set, connection has been reset
-        if connection_info.state.RST:
+        if not connection_info.state.is_reset and connection_info.state.RST:
             connection_info.state.is_reset = True
 
         # Identify if source or destination
         if not connection_info.source and connection_info.state.SYN == 1:
             connection_info.source = source
 
-        # Update packets for source and destination
+        # Update packets for total and source and destination
         if source == connection_info.source:
             connection_info.packets_sent += 1
         else:
             connection_info.packets_recv += 1
         connection_info.total_packets += 1
 
-        # Update bytes for source and destination
+        # Update bytes for total and source and destination
         if source == connection_info.source:
             connection_info.bytes_sent += len(tcp_header.get_padded_options())
         else:
