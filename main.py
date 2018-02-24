@@ -99,6 +99,7 @@ def packet_parser(header, data):
         connection_info.total_packets += 1
         # TODO: Update bytes sent/recv
         # TODO: Update total bytes
+        connection_info.total_bytes += len(tcp_header.get_padded_options())
 
         connections[connection_id] = connection_info
 
