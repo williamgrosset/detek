@@ -111,8 +111,8 @@ def main():
     pc = pcapy.open_offline(sys.argv[1])
     pc.setfilter('tcp')
 
-    # TODO: pass additional arg (connections) to callback
-    begin_s = time.clock()
+    # TODO: pass additional args (connections, begin_s) to callback
+    initial_time_s = time.time()
     pc.loop(0, packet_parser)
 
     # TODO: Results logger (loop through connections dictionary)
