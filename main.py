@@ -18,6 +18,24 @@ class ConnectionState:
         self.is_complete = False
         self.is_reset = False
 
+class ConnectionInfo:
+    '''
+    Class is used as the dictionary item.
+    '''
+    def __init__(self):
+        self.state = ConnectionState()
+        self.source = ()
+        self.destination = ()
+        self.start_s = 0
+        self.end_s = 0
+        self.duration_s = 0
+        self.packets_sent = 0
+        self.packets_recv = 0
+        self.total_packets = 0
+        self.bytes_sent = 0
+        self.bytes_recv = 0
+        self.total_bytes = 0
+
 class ConnectionId:
     '''
     Class is used as a dictionary key.
@@ -36,24 +54,6 @@ class ConnectionId:
     def __hash__(self):
         return(hash(self.peer1[0]) ^ hash(self.peer2[1])
                 ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
-
-class ConnectionInfo:
-    '''
-    Class is used as the dictionary item.
-    '''
-    def __init__(self):
-        self.state = ConnectionState()
-        self.source = ()
-        self.destination = ()
-        self.start_s = 0
-        self.end_s = 0
-        self.duration_s = 0
-        self.packets_sent = 0
-        self.packets_recv = 0
-        self.total_packets = 0
-        self.bytes_sent = 0
-        self.bytes_recv = 0
-        self.total_bytes = 0
 
 def packet_parser(header, data):
     decoder = ImpactDecoder.EthDecoder()
