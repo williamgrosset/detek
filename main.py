@@ -33,6 +33,7 @@ class ConnectionState:
         self.SYN = 0
         self.ACK = 0
         self.FIN = 0
+        self.RST = 0
         self.is_complete = False
         self.is_reset = False
 
@@ -44,6 +45,9 @@ class ConnectionState:
 
     def increment_FIN():
         self.FIN += 1
+
+    def increment_RST():
+        self.RST += 1
 
 class ConnectionInfo:
     '''
@@ -78,6 +82,10 @@ def packet_parser(header, data):
     else:
         connection_info = connections[connection_id]
 
+        connection_info.state.SYN += tcp_header.get_SYN()
+        connection_info.state.ACK += tcp_header.get_ACK()
+        connection_info.state.FIN += tcp_header.get_FIN()
+        connection_info.state.RST += tcp_header.get_RST()
         # TODO: Check for flags and update state
         # TODO: Update flag state for complete and reset
 
