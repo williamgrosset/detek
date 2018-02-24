@@ -6,10 +6,21 @@ from impacket import ImpactDecoder
 connections = {}
 initial_time_s = time.time()
 
+class ConnectionState:
+    '''
+    Class represents the state of the connection.
+    '''
+    def __init__(self):
+        self.SYN = 0
+        self.ACK = 0
+        self.FIN = 0
+        self.RST = 0
+        self.is_complete = False
+        self.is_reset = False
+
 class ConnectionId:
     '''
     Class is used as a dictionary key.
-    TODO: Define ConnectionId (tuple)
     '''
     def __init__(self, peer1, peer2):
         self.peer1 = peer1
@@ -26,21 +37,9 @@ class ConnectionId:
         return(hash(self.peer1[0]) ^ hash(self.peer2[1])
                 ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
 
-class ConnectionState:
-    '''
-    TODO: Class represents the state of the TCP connection.
-    '''
-    def __init__(self):
-        self.SYN = 0
-        self.ACK = 0
-        self.FIN = 0
-        self.RST = 0
-        self.is_complete = False
-        self.is_reset = False
-
 class ConnectionInfo:
     '''
-    TODO: Class is used as the dictionary item.
+    Class is used as the dictionary item.
     '''
     def __init__(self):
         self.state = ConnectionState()
@@ -69,6 +68,8 @@ def packet_parser(header, data):
         connections[connection_id] = ConnectionInfo()
     else:
         connection_info = connections[connection_id]
+
+        # TODO: Split each ConnectionInfo modifier into own method
 
         # Update state flags
         connection_info.state.SYN += tcp_header.get_SYN()
