@@ -55,6 +55,7 @@ class ConnectionInfo:
     '''
     def __init__(self):
         self.state = ConnectionState()
+        self.source = ()
         self.start_ms = 0
         self.end_ms = 0
         self.duration_ms = 0
@@ -93,12 +94,22 @@ def packet_parser(header, data):
         if connection_info.state.RST:
             connection_info.state.is_reset = True
 
-        # TODO: Identify if source or destination
-        # TODO: Update packets sent/recv
-        # TODO: Update total packets
+        # Identify if source and destination
+        if not connection_info.source and connection_info.state.SYN == 1:
+            connection_info.source = source
+
+        # Update packets for source and destination
+        if source == connection_info.source:
+            connection_info.packets_sent += 1
+        else:
+            connection_info.packets_recv += 1
         connection_info.total_packets += 1
-        # TODO: Update bytes sent/recv
-        # TODO: Update total bytes
+
+        # Update bytes for source and destination
+        if source == connection_info.source:
+            connection_info.bytes_sent += len(tcp_header.get_padded_options())
+        else:
+            connection_info.bytes_recv += len(tcp_header.get_padded_options())
         connection_info.total_bytes += len(tcp_header.get_padded_options())
 
         connections[connection_id] = connection_info
