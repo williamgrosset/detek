@@ -29,25 +29,12 @@ class ConnectionState:
     TODO: Class represents the state of the TCP connection.
     '''
     def __init__(self):
-        # TODO: Create ConnectionState class (SYN: 0; FIN: 0) (?)
         self.SYN = 0
         self.ACK = 0
         self.FIN = 0
         self.RST = 0
         self.is_complete = False
         self.is_reset = False
-
-    def increment_SYN():
-        self.SYN += 1
-
-    def increment_ACK():
-        self.ACK += 1
-
-    def increment_FIN():
-        self.FIN += 1
-
-    def increment_RST():
-        self.RST += 1
 
 class ConnectionInfo:
     '''
@@ -81,6 +68,7 @@ def packet_parser(header, data):
     else:
         connection_info = connections[connection_id]
 
+        # Update state flags
         connection_info.state.SYN += tcp_header.get_SYN()
         connection_info.state.ACK += tcp_header.get_ACK()
         connection_info.state.FIN += tcp_header.get_FIN()
@@ -98,14 +86,16 @@ def packet_parser(header, data):
         if not connection_info.source and connection_info.state.SYN == 1:
             connection_info.source = source
 
-        # Update packets for total and source and destination
+        # TODO: Update timestamp and duration
+
+        # Update packets for source, destination, and total
         if source == connection_info.source:
             connection_info.packets_sent += 1
         else:
             connection_info.packets_recv += 1
         connection_info.total_packets += 1
 
-        # Update bytes for total and source and destination
+        # Update bytes for source, destination, and total
         options_size = len(tcp_header.get_padded_options())
         if source == connection_info.source:
             connection_info.bytes_sent += options_size
@@ -123,9 +113,8 @@ def main():
     # TODO: pass additional arg (connections) to callback
     pc.loop(0, packet_parser)
 
-    print(len(connections))
-
-    # TODO: Results logger
+    # TODO: Results logger (loop through connections dictionary)
+    # TODO: Print results for Section A, B, C, and D
 
 if __name__ == '__main__':
     main()

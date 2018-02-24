@@ -19,8 +19,7 @@
     + total data bytes 
 + Parse each packet identifying the TCP connection (keep track of state)
   + focus on a single packet
-+ Grab number for all TCP connections and compare to WS
-+ Complete `Section C) and D)`
++ Grab number for all TCP connections and compare to WS (48)
 + Error handling, nit clean-up, and organize repo
 + Finish README and add example gif
 
