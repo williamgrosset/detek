@@ -44,6 +44,7 @@ class ConnectionInfo:
     def __init__(self):
         self.state = ConnectionState()
         self.source = ()
+        self.destination = ()
         self.start_s = 0
         self.end_s = 0
         self.duration_s = 0
@@ -86,8 +87,9 @@ def packet_parser(header, data):
             connection_info.state.is_reset = True
 
         # Identify if source or destination
-        if not connection_info.source and connection_info.state.SYN == 1:
+        if not connection_info.source and not connection_info.destination and connection_info.state.SYN == 1:
             connection_info.source = source
+            connection_info.destination = destination
 
         # Update connection start, end, and duration (seconds)
         if not connection_info.start_s and connection_info.state.SYN == 1:
