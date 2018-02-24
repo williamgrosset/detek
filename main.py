@@ -86,14 +86,20 @@ def packet_parser(header, data):
         connection_info.state.ACK += tcp_header.get_ACK()
         connection_info.state.FIN += tcp_header.get_FIN()
         connection_info.state.RST += tcp_header.get_RST()
-        # TODO: Check for flags and update state
-        # TODO: Update flag state for complete and reset
+
+        if connection_info.state.SYN and connection_info.state.FIN:
+            connection_info.state.is_complete = True
+
+        if connection_info.state.RST:
+            connection_info.state.is_reset = True
 
         # TODO: Identify if source or destination
         # TODO: Update packets sent/recv
         # TODO: Update total packets
         # TODO: Update bytes sent/recv
         # TODO: Update total bytes
+
+        connections[connection_id] = connection_info
 
 def main():
     # TODO: Error handling for file type
