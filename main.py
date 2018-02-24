@@ -4,6 +4,7 @@ import pcapy
 from impacket import ImpactDecoder
 
 connections = {}
+initial_time_s = time.time()
 
 class ConnectionId:
     '''
@@ -44,9 +45,9 @@ class ConnectionInfo:
     def __init__(self):
         self.state = ConnectionState()
         self.source = ()
-        self.start_ms = 0
-        self.end_ms = 0
-        self.duration_ms = 0
+        self.start_s = 0
+        self.end_s = 0
+        self.duration_s = 0
         self.packets_sent = 0
         self.packets_recv = 0
         self.total_packets = 0
@@ -88,6 +89,8 @@ def packet_parser(header, data):
             connection_info.source = source
 
         # TODO: Update timestamp and duration
+        if not connection_info.start_s and connection_info.state.SYN == 1:
+            connection_info.start_s = time.time() - initial_time_s
 
         # Update packets for source, destination, and total
         if source == connection_info.source:
@@ -112,7 +115,6 @@ def main():
     pc.setfilter('tcp')
 
     # TODO: pass additional args (connections, begin_s) to callback
-    initial_time_s = time.time()
     pc.loop(0, packet_parser)
 
     # TODO: Results logger (loop through connections dictionary)
