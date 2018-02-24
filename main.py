@@ -88,9 +88,15 @@ def packet_parser(header, data):
         if not connection_info.source and connection_info.state.SYN == 1:
             connection_info.source = source
 
-        # TODO: Update timestamp and duration
+        # Update connection start, end, and duration (seconds)
         if not connection_info.start_s and connection_info.state.SYN == 1:
             connection_info.start_s = time.time() - initial_time_s
+
+        if not connection_info.end_s and connection_info.state.FIN == 1:
+            connection_info.end_s = time.time() - initial_time_s
+
+        if not connection_info.duration_s and connection_info.end_s and connection_info.start_s:
+            connection_info.duration_s = connection_info.end_s - connection_info.start_s
 
         # Update packets for source, destination, and total
         if source == connection_info.source:
