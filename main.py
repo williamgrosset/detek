@@ -76,8 +76,6 @@ def packet_parser(header, data):
     destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
     connection_id = ConnectionId(source, destination)
 
-    print 'Connection: %s' % (connection_id)
-
     if not connections.has_key(connection_id):
         connections[connection_id] = ConnectionInfo()
     else:
@@ -88,13 +86,15 @@ def packet_parser(header, data):
         connection_info.state.FIN += tcp_header.get_FIN()
         connection_info.state.RST += tcp_header.get_RST()
 
-        if connection_info.state.SYN and connection_info.state.FIN:
+        # If state is at least S1F1, connection is complete
+        if not connection_info.state.is_complete and connection_info.state.SYN and connection_info.state.FIN:
             connection_info.state.is_complete = True
 
+        # If RST flag is set, connection has been reset
         if connection_info.state.RST:
             connection_info.state.is_reset = True
 
-        # Identify if source and destination
+        # Identify if source or destination
         if not connection_info.source and connection_info.state.SYN == 1:
             connection_info.source = source
 
