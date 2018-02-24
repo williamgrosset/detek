@@ -24,15 +24,24 @@ class ConnectionId:
         return(hash(self.peer1[0]) ^ hash(self.peer2[1])
                 ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
 
+class ConnectionState:
+    '''
+    TODO: Class represents the state of the TCP connection.
+    '''
+    def __init__(self):
+        # TODO: Create ConnectionState class (SYN: 0; FIN: 0) (?)
+        self.SYN = 0
+        self.ACK = 0
+        self.FIN = 0
+        self.is_complete = false
+        self.is_reset = false
+
 class ConnectionInfo:
     '''
     TODO: Class is used as the dictionary item.
     '''
     def __init__(self):
-        # TODO: Create ConnectionState object (SYN: 0; FIN: 0) (?)
-        self.state = ''
-        self.is_complete = false
-        self.is_reset = false
+        self.state = ConnectionState()
         self.start_ms = 0
         self.end_ms = 0
         self.duration_ms = 0
