@@ -2,9 +2,7 @@
 :vertical_traffic_light: TCP Traffic Analysis.
 
 ## TODO
-+ Review TCP lecture notes
-+ ~Use `impacket` to parse info for each packet~
-+ Create a `HashMap<connection_id, connection_obj>` (algorithm needs auditing)
++ Create a `HashMap<connection_id, connection_obj>` (**AUDIT ALGORITHM**)
   + `connection_id`: 4-attribute tuple (duplex supported)
     + when adding to HashMap, check for inverse of source and destination values
   + `connection_obj`:
@@ -17,11 +15,11 @@
     + data bytes sent from source &rightarrow; destination
     + data bytes sent from destination &rightarrow; source 
     + total data bytes 
-+ Parse each packet identifying the TCP connection (keep track of state)
-  + focus on a single packet
 + Grab number for all TCP connections and compare to WS (48)
++ Complete results logger
 + Error handling, nit clean-up, and organize repo
 + Finish README and add example gif
++ Review TCP lecture notes
 
 ## Overview
 ...
@@ -33,7 +31,7 @@
 3. ...
 
 ### Strategy
-1. Initialize HashMap.
+1. Create dictionary for storing state and information for unique connections (duplex support).
 2. Parse each packet in capture file.
   + Add unique TCP connection to HashMap.
   + Update connection object information for each TCP connection
