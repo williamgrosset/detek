@@ -2,7 +2,7 @@
 :vertical_traffic_light: TCP Traffic Analysis.
 
 ## TODO
-+ Create a `HashMap<connection_id, connection_obj>` (**AUDIT ALGORITHM**)
++ Create a `HashMap<connection_id, connection_obj>` (**AUDIT ALGORITHM** and **VERIFY WITH WIRESHARK**)
   + `connection_id`: 4-attribute tuple (duplex supported)
     + when adding to HashMap, check for inverse of source and destination values
   + `connection_obj`:
@@ -15,8 +15,7 @@
     + data bytes sent from source &rightarrow; destination
     + data bytes sent from destination &rightarrow; source 
     + total data bytes 
-+ Grab number for all TCP connections and compare to WS (48)
-+ Complete results logger
++ Complete results logger (Section A, B, C, and D)
 + Error handling, nit clean-up, and organize repo
 + Finish README and add example gif
 + Review TCP lecture notes

@@ -91,7 +91,7 @@ def packet_parser(header, data):
             connection_info.source = source
             connection_info.destination = destination
 
-        # Update connection start, end, and duration (seconds)
+        # TODO: Verify formula — Update connection start, end, and duration (seconds)
         if not connection_info.start_s and connection_info.state.SYN == 1:
             connection_info.start_s = time.time() - initial_time_s
 
@@ -106,14 +106,17 @@ def packet_parser(header, data):
             connection_info.packets_sent += 1
         else:
             connection_info.packets_recv += 1
+
         connection_info.total_packets += 1
 
         # Update bytes for source, destination, and total
         options_size = len(tcp_header.get_padded_options())
+
         if source == connection_info.source:
             connection_info.bytes_sent += options_size
         else:
             connection_info.bytes_recv += options_size
+
         connection_info.total_bytes += options_size
 
         connections[connection_id] = connection_info
