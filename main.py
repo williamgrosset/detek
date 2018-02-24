@@ -16,8 +16,12 @@ class Connection:
         if ((self.peer1 == other.peer1 and self.peer2 == other.peer2) or
             (self.peer1 == other.peer2 and self.peer2 == other.peer1)):
             return 0
-        else
+        else:
             return -1
+
+    def __hash__(self):
+        return(hash(self.peer1[0]) ^ hash(self.peer2[1])
+                ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
 
 '''
 TODO: Class is used as the dictionary value.
@@ -35,6 +39,9 @@ def packet_parser(header, data):
 
     print 'Connection: %s' % (connection)
 
+    if not connections.has_key(connection):
+        connections[connection] = 'unique'
+
 
 def main():
     # TODO: Error handling for file type
@@ -43,6 +50,8 @@ def main():
 
     # TODO: pass additional arg (connections) to callback
     pc.loop(0, packet_parser)
+
+    print(len(connections))
 
     # TODO: Results logger
 
