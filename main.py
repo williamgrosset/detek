@@ -4,9 +4,10 @@ from impacket import ImpactDecoder
 
 connections = {}
 
-class Connection:
+class ConnectionId:
     '''
     Class is used as a dictionary key.
+    TODO: Define ConnectionId (tuple)
     '''
     def __init__(self, peer1, peer2):
         self.peer1 = peer1
@@ -23,9 +24,24 @@ class Connection:
         return(hash(self.peer1[0]) ^ hash(self.peer2[1])
                 ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
 
-'''
-TODO: Class is used as the dictionary value.
-'''
+class ConnectionInfo:
+    '''
+    TODO: Class is used as the dictionary item.
+    '''
+    def __init__(self):
+        # TODO: Create ConnectionState object (SYN: 0; FIN: 0) (?)
+        self.state = ''
+        self.is_complete = false
+        self.is_reset = false
+        self.start_ms = 0
+        self.end_ms = 0
+        self.duration_ms = 0
+        self.packets_sent = 0
+        self.packets_recv = 0
+        self.total_packets = 0
+        self.bytes_sent = 0
+        self.bytes_recv = 0
+        self.total_bytes = 0
 
 def packet_parser(header, data):
     decoder = ImpactDecoder.EthDecoder()
@@ -35,12 +51,12 @@ def packet_parser(header, data):
 
     source = (ip_header.get_ip_src(), tcp_header.get_th_sport())
     destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
-    connection = Connection(source, destination)
+    connection_id = ConnectionId(source, destination)
 
-    print 'Connection: %s' % (connection)
+    print 'Connection: %s' % (connection_id)
 
-    if not connections.has_key(connection):
-        connections[connection] = 'unique'
+    if not connections.has_key(connection_id):
+        connections[connection_id] = 'unique'
 
 
 def main():
