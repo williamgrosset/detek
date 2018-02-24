@@ -4,7 +4,7 @@
 ## TODO
 + Review TCP lecture notes
 + ~Use `impacket` to parse info for each packet~
-+ Create a `HashMap<connection_id, connection_obj>` (TODO: algorithm needs auditing)
++ Create a `HashMap<connection_id, connection_obj>` (algorithm needs auditing)
   + `connection_id`: 4-attribute tuple (duplex supported)
     + when adding to HashMap, check for inverse of source and destination values
   + `connection_obj`:

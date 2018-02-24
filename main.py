@@ -1,4 +1,5 @@
 import sys
+import time
 import pcapy
 from impacket import ImpactDecoder
 
@@ -111,6 +112,7 @@ def main():
     pc.setfilter('tcp')
 
     # TODO: pass additional arg (connections) to callback
+    begin_s = time.clock()
     pc.loop(0, packet_parser)
 
     # TODO: Results logger (loop through connections dictionary)
