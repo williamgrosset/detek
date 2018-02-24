@@ -73,12 +73,19 @@ def packet_parser(header, data):
 
     print 'Connection: %s' % (connection_id)
 
-    connection_info = ConnectionInfo()
-    print(connection_info.state.SYN)
-
     if not connections.has_key(connection_id):
-        connections[connection_id] = 'unique'
+        connections[connection_id] = ConnectionInfo()
+    else:
+        connection_info = connections[connection_id]
 
+        # TODO: Check for flags and update state
+        # TODO: Update flag state for complete and reset
+
+        # TODO: Identify if source or destination
+        # TODO: Update packets sent/recv
+        # TODO: Update total packets
+        # TODO: Update bytes sent/recv
+        # TODO: Update total bytes
 
 def main():
     # TODO: Error handling for file type
