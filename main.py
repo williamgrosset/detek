@@ -66,6 +66,7 @@ def packet_parser(header, data):
     connection_id = ConnectionId(source, destination)
 
     if not connections.has_key(connection_id):
+        # TODO: Initialize values appropriately with constructor (source, destination)
         connections[connection_id] = ConnectionInfo()
     else:
         connection_info = connections[connection_id]
@@ -91,7 +92,7 @@ def packet_parser(header, data):
             connection_info.source = source
             connection_info.destination = destination
 
-        # TODO: Verify formula — Update connection start, end, and duration (seconds)
+        # TODO: Verify formula - Update connection start, end, and duration (seconds)
         if not connection_info.start_s and connection_info.state.SYN == 1:
             connection_info.start_s = time.time() - initial_time_s
 
@@ -118,6 +119,13 @@ def packet_parser(header, data):
             connection_info.bytes_recv += options_size
 
         connection_info.total_bytes += options_size
+
+        print('Source')
+        print(connection_info.source)
+        print('Destination')
+        print(connection_info.destination)
+        print('Total packets')
+        print(connection_info.total_packets)
 
         connections[connection_id] = connection_info
 
