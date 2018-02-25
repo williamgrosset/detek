@@ -10,11 +10,11 @@ class ConnectionState:
     '''
     Class represents the state of the connection.
     '''
-    def __init__(self, SYN, ACK, FIN):
+    def __init__(self, SYN, ACK, FIN, RST):
         self.SYN = SYN
         self.ACK = ACK
         self.FIN = FIN
-        self.RST = 0
+        self.RST = RST
         self.is_complete = False
         self.is_reset = False
 
@@ -72,7 +72,7 @@ def packet_parser(header, data):
 
     if not connections.has_key(connection_id):
         # TODO: Initialize values appropriately with constructor (source, destination)
-        connection_state = ConnectionState(SYN, ACK, FIN)
+        connection_state = ConnectionState(SYN, ACK, FIN, RST)
         connection_info = ConnectionInfo(connection_state, source, destination, time.time() - initial_time_s, 1, options_size)
         connections[connection_id] = connection_info
     else:
