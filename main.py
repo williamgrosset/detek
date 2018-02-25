@@ -31,10 +31,8 @@ class ConnectionInfo:
         self.duration_s = 0
         self.packets_sent = packets_sent
         self.packets_recv = 0
-        self.total_packets = packets_sent
         self.bytes_sent = bytes_sent
         self.bytes_recv = 0
-        self.total_bytes = bytes_sent
 
 class ConnectionId:
     '''
@@ -101,28 +99,22 @@ def packet_parser(header, data):
         if not connection_info.duration_s and connection_info.end_s and connection_info.start_s:
             connection_info.duration_s = connection_info.end_s - connection_info.start_s
 
-        # Update packets for source, destination, and total
+        # Update packets for source and destination
         if source == connection_info.source:
             connection_info.packets_sent += 1
         else:
             connection_info.packets_recv += 1
 
-        connection_info.total_packets += 1
-
-        # Update bytes for source, destination, and total
+        # Update bytes for source and destination
         if source == connection_info.source:
             connection_info.bytes_sent += options_size
         else:
             connection_info.bytes_recv += options_size
 
-        connection_info.total_bytes += options_size
-
         print('Source')
         print(connection_info.source)
         print('Destination')
         print(connection_info.destination)
-        print('Total packets')
-        print(connection_info.total_packets)
 
         connections[connection_id] = connection_info
 
