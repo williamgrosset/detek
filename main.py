@@ -9,6 +9,7 @@ initial_time_s = time.time()
 class ConnectionState:
     '''
     Class represents the state of the connection.
+    TODO: Add explanation for ConnectionState object.
     '''
     def __init__(self, SYN, ACK, FIN, RST):
         self.SYN = SYN
@@ -21,6 +22,7 @@ class ConnectionState:
 class ConnectionInfo:
     '''
     Class is used as the dictionary item.
+    TODO: Add explanation for ConnectionInfo object.
     '''
     def __init__(self, state, source, destination, start_s, packets_sent, bytes_sent):
         self.state = state
@@ -39,6 +41,7 @@ class ConnectionInfo:
 class ConnectionId:
     '''
     Class is used as a dictionary key.
+    TODO: Add explanation for ConnectionId object.
     '''
     def __init__(self, peer1, peer2):
         self.peer1 = peer1
@@ -52,8 +55,7 @@ class ConnectionId:
             return -1
 
     def __hash__(self):
-        return(hash(self.peer1[0]) ^ hash(self.peer2[1])
-                ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
+        return (hash(self.peer1[0]) ^ hash(self.peer2[1]) ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
 
 def packet_parser(header, data):
     decoder = ImpactDecoder.EthDecoder()
@@ -64,6 +66,7 @@ def packet_parser(header, data):
     source = (ip_header.get_ip_src(), tcp_header.get_th_sport())
     destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
     connection_id = ConnectionId(source, destination)
+    # TODO: Verify amount for bytes sent/recv
     options_size = sys.getsizeof(tcp_header.get_padded_options())
     SYN = tcp_header.get_SYN()
     ACK = tcp_header.get_ACK()
@@ -106,7 +109,7 @@ def packet_parser(header, data):
         else:
             connection_info.packets_recv += 1
 
-        # Update bytes for source and destination
+        # TODO: Verify formula - Update bytes for source and destination
         if source == connection_info.source:
             connection_info.bytes_sent += options_size
         else:
