@@ -31,8 +31,10 @@ class ConnectionInfo:
         self.duration_s = 0
         self.packets_sent = packets_sent
         self.packets_recv = 0
+        self.total_packets = self.packets_sent + self.packets_recv
         self.bytes_sent = bytes_sent
         self.bytes_recv = 0
+        self.total_bytes = self.bytes_sent + self.bytes_recv
 
 class ConnectionId:
     '''
@@ -62,14 +64,13 @@ def packet_parser(header, data):
     source = (ip_header.get_ip_src(), tcp_header.get_th_sport())
     destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
     connection_id = ConnectionId(source, destination)
-    options_size = len(tcp_header.get_padded_options())
+    options_size = sys.getsizeof(tcp_header.get_padded_options())
     SYN = tcp_header.get_SYN()
     ACK = tcp_header.get_ACK()
     FIN = tcp_header.get_FIN()
     RST = tcp_header.get_RST()
 
     if not connections.has_key(connection_id):
-        # TODO: Initialize values appropriately with constructor (source, destination)
         connection_state = ConnectionState(SYN, ACK, FIN, RST)
         connection_info = ConnectionInfo(connection_state, source, destination, time.time() - initial_time_s, 1, options_size)
         connections[connection_id] = connection_info
@@ -115,6 +116,10 @@ def packet_parser(header, data):
         print(connection_info.source)
         print('Destination')
         print(connection_info.destination)
+        print('Bytes sent')
+        print(connection_info.bytes_sent)
+        print('Bytes recv')
+        print(connection_info.bytes_recv)
 
         connections[connection_id] = connection_info
 
