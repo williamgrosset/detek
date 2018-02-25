@@ -67,7 +67,7 @@ def packet_parser(header, data):
     destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
     connection_id = ConnectionId(source, destination)
     # TODO: Verify amount for bytes sent/recv
-    options_size = sys.getsizeof(tcp_header.get_padded_options())
+    options_size = len(tcp_header.get_padded_options())
     SYN = tcp_header.get_SYN()
     ACK = tcp_header.get_ACK()
     FIN = tcp_header.get_FIN()
@@ -109,20 +109,15 @@ def packet_parser(header, data):
         else:
             connection_info.packets_recv += 1
 
+        connection_info.total_packets += 1
+
         # TODO: Verify formula - Update bytes for source and destination
         if source == connection_info.source:
             connection_info.bytes_sent += options_size
         else:
             connection_info.bytes_recv += options_size
 
-        print('Source')
-        print(connection_info.source)
-        print('Destination')
-        print(connection_info.destination)
-        print('Bytes sent')
-        print(connection_info.bytes_sent)
-        print('Bytes recv')
-        print(connection_info.bytes_recv)
+        connection_info.total_bytes += 1
 
         connections[connection_id] = connection_info
 
@@ -133,6 +128,19 @@ def main():
 
     # TODO: pass additional args (connections, begin_s) to callback
     pc.loop(0, packet_parser)
+
+    for key, value in connections.iteritems():
+        if value.state.is_complete:
+            print('Source')
+            print(value.source)
+            print('Destination')
+            print(value.destination)
+            print('Start time')
+            print(value.start_s)
+            print('End time')
+            print(value.end_s)
+            print('Duration')
+            print(value.duration_s)
 
     # TODO: Results logger (loop through connections dictionary)
     # TODO: Print results for Section A, B, C, and D

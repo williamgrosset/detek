@@ -15,6 +15,8 @@
     + data bytes sent from source &rightarrow; destination
     + data bytes sent from destination &rightarrow; source 
     + total data bytes 
++ Calculate start, end, duration time
++ Calculate byte send, recv, total
 + Complete results logger (Section A, B, C, and D)
 + Error handling, nit clean-up, and organize repo
 + Finish README and add example gif
