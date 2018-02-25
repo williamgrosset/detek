@@ -10,10 +10,10 @@ class ConnectionState:
     '''
     Class represents the state of the connection.
     '''
-    def __init__(self):
-        self.SYN = 0
-        self.ACK = 0
-        self.FIN = 0
+    def __init__(self, SYN, ACK, FIN):
+        self.SYN = SYN
+        self.ACK = ACK
+        self.FIN = FIN
         self.RST = 0
         self.is_complete = False
         self.is_reset = False
@@ -22,19 +22,19 @@ class ConnectionInfo:
     '''
     Class is used as the dictionary item.
     '''
-    def __init__(self):
-        self.state = ConnectionState()
-        self.source = ()
-        self.destination = ()
-        self.start_s = 0
+    def __init__(self, state, source, destination, start_s, packets_sent, bytes_sent):
+        self.state = state
+        self.source = source
+        self.destination = destination
+        self.start_s = start_s
         self.end_s = 0
         self.duration_s = 0
-        self.packets_sent = 0
+        self.packets_sent = packets_sent
         self.packets_recv = 0
-        self.total_packets = 0
-        self.bytes_sent = 0
+        self.total_packets = packets_sent
+        self.bytes_sent = bytes_sent
         self.bytes_recv = 0
-        self.total_bytes = 0
+        self.total_bytes = bytes_sent
 
 class ConnectionId:
     '''
@@ -64,20 +64,27 @@ def packet_parser(header, data):
     source = (ip_header.get_ip_src(), tcp_header.get_th_sport())
     destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
     connection_id = ConnectionId(source, destination)
+    options_size = len(tcp_header.get_padded_options())
+    SYN = tcp_header.get_SYN()
+    ACK = tcp_header.get_ACK()
+    FIN = tcp_header.get_FIN()
+    RST = tcp_header.get_RST()
 
     if not connections.has_key(connection_id):
         # TODO: Initialize values appropriately with constructor (source, destination)
-        connections[connection_id] = ConnectionInfo()
+        connection_state = ConnectionState(SYN, ACK, FIN)
+        connection_info = ConnectionInfo(connection_state, source, destination, time.time() - initial_time_s, 1, options_size)
+        connections[connection_id] = connection_info
     else:
         connection_info = connections[connection_id]
 
         # TODO: Split each ConnectionInfo modifier into own method
 
         # Update state flags
-        connection_info.state.SYN += tcp_header.get_SYN()
-        connection_info.state.ACK += tcp_header.get_ACK()
-        connection_info.state.FIN += tcp_header.get_FIN()
-        connection_info.state.RST += tcp_header.get_RST()
+        connection_info.state.SYN += SYN
+        connection_info.state.ACK += ACK
+        connection_info.state.FIN += FIN
+        connection_info.state.RST += RST
 
         # If state is at least S1F1, connection is complete
         if not connection_info.state.is_complete and connection_info.state.SYN and connection_info.state.FIN:
@@ -87,15 +94,7 @@ def packet_parser(header, data):
         if not connection_info.state.is_reset and connection_info.state.RST:
             connection_info.state.is_reset = True
 
-        # Identify if source or destination
-        if not connection_info.source and not connection_info.destination and connection_info.state.SYN == 1:
-            connection_info.source = source
-            connection_info.destination = destination
-
         # TODO: Verify formula - Update connection start, end, and duration (seconds)
-        if not connection_info.start_s and connection_info.state.SYN == 1:
-            connection_info.start_s = time.time() - initial_time_s
-
         if not connection_info.end_s and connection_info.state.FIN == 1:
             connection_info.end_s = time.time() - initial_time_s
 
@@ -111,8 +110,6 @@ def packet_parser(header, data):
         connection_info.total_packets += 1
 
         # Update bytes for source, destination, and total
-        options_size = len(tcp_header.get_padded_options())
-
         if source == connection_info.source:
             connection_info.bytes_sent += options_size
         else:
