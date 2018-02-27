@@ -5,8 +5,6 @@ import sys
 import time
 import pcapy
 
-initial_packet_ts = 0
-
 class ConnectionState:
     '''
     Class represents the state of the connection.
@@ -62,7 +60,7 @@ class ConnectionId:
     def __hash__(self):
         return (hash(self.peer1[0]) ^ hash(self.peer2[1]) ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
 
-def packet_parser(pc, connections):
+def packet_parser(pc, connections, initial_packet_ts):
     pckt = pc.next()
 
     while pckt:
@@ -88,7 +86,6 @@ def packet_parser(pc, connections):
 
         timestamp = header.getts()[0] + (header.getts()[1] / 1000000)
 
-        global initial_packet_ts
         if not initial_packet_ts:
             initial_packet_ts = timestamp
 
@@ -153,7 +150,8 @@ def main():
 
     # TODO: pass additional args (connections, begin_s) to callback
     connections = {}
-    packet_parser(pc, connections)
+    initial_packet_ts = 0
+    packet_parser(pc, connections, initial_packet_ts)
 
     for key, value in connections.iteritems():
         if value.state.is_complete:
@@ -167,6 +165,12 @@ def main():
             print(value.bytes_recv)
             print('Total bytes')
             print(value.total_bytes)
+            print('Start')
+            print(value.start_rs)
+            print('End')
+            print(value.end_rs)
+            print('Duration')
+            print(value.duration_s)
 
     # TODO: Results logger (loop through connections dictionary)
     # TODO: Print results for Section A, B, C, and D
