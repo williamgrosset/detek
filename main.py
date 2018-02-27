@@ -1,7 +1,8 @@
+from __future__ import division
+from impacket import ImpactDecoder
 import sys
 import time
 import pcapy
-from impacket import ImpactDecoder
 
 connections = {}
 initial_time_s = time.time()
@@ -68,7 +69,7 @@ def packet_parser(header, data):
     connection_id = ConnectionId(source, destination)
     # TODO: Verify amount for bytes sent/recv
     options_size = len(tcp_header.get_options())
-    timestamp = header.getts()[0]
+    timestamp = header.getts()[0] + (header.getts()[1] / 1000000)
 
     SYN = tcp_header.get_SYN()
     ACK = tcp_header.get_ACK()
