@@ -67,7 +67,9 @@ def packet_parser(header, data):
     destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
     connection_id = ConnectionId(source, destination)
     # TODO: Verify amount for bytes sent/recv
-    options_size = len(tcp_header.get_padded_options())
+    options_size = len(tcp_header.get_options())
+    timestamp = header.getts()[0]
+
     SYN = tcp_header.get_SYN()
     ACK = tcp_header.get_ACK()
     FIN = tcp_header.get_FIN()
@@ -75,7 +77,7 @@ def packet_parser(header, data):
 
     if not connections.has_key(connection_id):
         connection_state = ConnectionState(SYN, ACK, FIN, RST)
-        connection_info = ConnectionInfo(connection_state, source, destination, time.time() - initial_time_s, 1, options_size)
+        connection_info = ConnectionInfo(connection_state, source, destination, timestamp, 1, options_size)
         connections[connection_id] = connection_info
     else:
         connection_info = connections[connection_id]
@@ -96,11 +98,9 @@ def packet_parser(header, data):
         if not connection_info.state.is_reset and connection_info.state.RST:
             connection_info.state.is_reset = True
 
-        # TODO: Verify formula - Update connection start, end, and duration (seconds)
-        if not connection_info.end_s and connection_info.state.FIN == 1:
-            connection_info.end_s = time.time() - initial_time_s
-
-        if not connection_info.duration_s and connection_info.end_s and connection_info.start_s:
+        # Update end connection time on last FIN
+        if FIN:
+            connection_info.end_s = timestamp
             connection_info.duration_s = connection_info.end_s - connection_info.start_s
 
         # Update packets for source and destination
@@ -117,7 +117,7 @@ def packet_parser(header, data):
         else:
             connection_info.bytes_recv += options_size
 
-        connection_info.total_bytes += 1
+        connection_info.total_bytes += options_size
 
         connections[connection_id] = connection_info
 
@@ -135,10 +135,6 @@ def main():
             print(value.source)
             print('Destination')
             print(value.destination)
-            print('Start time')
-            print(value.start_s)
-            print('End time')
-            print(value.end_s)
             print('Duration')
             print(value.duration_s)
 
