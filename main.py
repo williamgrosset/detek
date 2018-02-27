@@ -1,10 +1,10 @@
 from __future__ import division
 from impacket import ImpactDecoder
+from impacket import ImpactPacket
 import sys
 import time
 import pcapy
 
-connections = {}
 initial_packet_ts = 0
 
 class ConnectionState:
@@ -62,77 +62,89 @@ class ConnectionId:
     def __hash__(self):
         return (hash(self.peer1[0]) ^ hash(self.peer2[1]) ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
 
-def packet_parser(header, data):
-    decoder = ImpactDecoder.EthDecoder()
-    ethernet_packet = decoder.decode(data)
-    ip_header = ethernet_packet.child()
-    tcp_header = ip_header.child()
+def packet_parser(pc, connections):
+    pckt = pc.next()
 
-    source = (ip_header.get_ip_src(), tcp_header.get_th_sport())
-    destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
-    connection_id = ConnectionId(source, destination)
-    # TODO: Verify amount for bytes sent/recv
-    options_size = 0
-    for option in tcp_header.get_options():
-        options_size += option.get_size()
+    while pckt:
+        header = pckt[0]
+        data = pckt[1]
 
-    timestamp = header.getts()[0] + (header.getts()[1] / 1000000)
+        decoder = ImpactDecoder.EthDecoder()
+        ethernet_packet = decoder.decode(data)
 
-    global initial_packet_ts
-    if not initial_packet_ts:
-        initial_packet_ts = timestamp
+        if ethernet_packet.get_ether_type() != ImpactPacket.IP.ethertype:
+            return
 
-    SYN = tcp_header.get_SYN()
-    ACK = tcp_header.get_ACK()
-    FIN = tcp_header.get_FIN()
-    RST = tcp_header.get_RST()
+        ip_header = ethernet_packet.child()
+        tcp_header = ip_header.child()
 
-    if not connections.has_key(connection_id):
-        connection_state = ConnectionState(SYN, ACK, FIN, RST)
-        connection_info = ConnectionInfo(connection_state, source, destination, timestamp, timestamp % initial_packet_ts, 1, options_size)
-        connections[connection_id] = connection_info
-    else:
-        connection_info = connections[connection_id]
+        source = (ip_header.get_ip_src(), tcp_header.get_th_sport())
+        destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
+        connection_id = ConnectionId(source, destination)
+        # TODO: Verify amount for bytes sent/recv
+        options_size = 0
+        for option in tcp_header.get_options():
+            options_size += option.get_size()
 
-        # TODO: Split each ConnectionInfo modifier into own method
+        timestamp = header.getts()[0] + (header.getts()[1] / 1000000)
 
-        # Update state flags
-        connection_info.state.SYN += SYN
-        connection_info.state.ACK += ACK
-        connection_info.state.FIN += FIN
-        connection_info.state.RST += RST
+        global initial_packet_ts
+        if not initial_packet_ts:
+            initial_packet_ts = timestamp
 
-        # If state is at least S1F1, connection is complete
-        if not connection_info.state.is_complete and connection_info.state.SYN and connection_info.state.FIN:
-            connection_info.state.is_complete = True
+        SYN = tcp_header.get_SYN()
+        ACK = tcp_header.get_ACK()
+        FIN = tcp_header.get_FIN()
+        RST = tcp_header.get_RST()
 
-        # If RST flag is set, connection has been reset
-        if not connection_info.state.is_reset and connection_info.state.RST:
-            connection_info.state.is_reset = True
-
-        # Update connection duration time for each FIN
-        if FIN:
-            connection_info.end_s = timestamp
-            connection_info.end_rs = timestamp % initial_packet_ts
-            connection_info.duration_s = connection_info.end_s - connection_info.start_s
-
-        # Update packets for source and destination
-        if source == connection_info.source:
-            connection_info.packets_sent += 1
+        if not connections.has_key(connection_id):
+            connection_state = ConnectionState(SYN, ACK, FIN, RST)
+            connection_info = ConnectionInfo(connection_state, source, destination, timestamp, timestamp % initial_packet_ts, 1, options_size)
+            connections[connection_id] = connection_info
         else:
-            connection_info.packets_recv += 1
+            connection_info = connections[connection_id]
 
-        connection_info.total_packets += 1
+            # TODO: Split each ConnectionInfo modifier into own method
 
-        # TODO: Verify formula - Update bytes for source and destination
-        if source == connection_info.source:
-            connection_info.bytes_sent += options_size
-        else:
-            connection_info.bytes_recv += options_size
+            # Update state flags
+            connection_info.state.SYN += SYN
+            connection_info.state.ACK += ACK
+            connection_info.state.FIN += FIN
+            connection_info.state.RST += RST
 
-        connection_info.total_bytes += options_size
+            # If state is at least S1F1, connection is complete
+            if not connection_info.state.is_complete and connection_info.state.SYN and connection_info.state.FIN:
+                connection_info.state.is_complete = True
 
-        connections[connection_id] = connection_info
+            # If RST flag is set, connection has been reset
+            if not connection_info.state.is_reset and connection_info.state.RST:
+                connection_info.state.is_reset = True
+
+            # Update connection duration time for each FIN
+            if FIN:
+                connection_info.end_s = timestamp
+                connection_info.end_rs = timestamp % initial_packet_ts
+                connection_info.duration_s = connection_info.end_s - connection_info.start_s
+
+            # Update packets for source and destination
+            if source == connection_info.source:
+                connection_info.packets_sent += 1
+            else:
+                connection_info.packets_recv += 1
+
+            connection_info.total_packets += 1
+
+            # TODO: Verify formula - Update bytes for source and destination
+            if source == connection_info.source:
+                connection_info.bytes_sent += options_size
+            else:
+                connection_info.bytes_recv += options_size
+
+            connection_info.total_bytes += options_size
+
+            connections[connection_id] = connection_info
+
+        pckt = pc.next()
 
 def main():
     # TODO: Error handling for file type
@@ -140,7 +152,8 @@ def main():
     pc.setfilter('tcp')
 
     # TODO: pass additional args (connections, begin_s) to callback
-    pc.loop(0, packet_parser)
+    connections = {}
+    packet_parser(pc, connections)
 
     for key, value in connections.iteritems():
         if value.state.is_complete:
