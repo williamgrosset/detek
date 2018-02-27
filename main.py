@@ -72,7 +72,10 @@ def packet_parser(header, data):
     destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
     connection_id = ConnectionId(source, destination)
     # TODO: Verify amount for bytes sent/recv
-    options_size = len(tcp_header.get_options())
+    options_size = 0
+    for option in tcp_header.get_options():
+        options_size += option.get_size()
+
     timestamp = header.getts()[0] + (header.getts()[1] / 1000000)
 
     global initial_packet_ts
@@ -145,12 +148,12 @@ def main():
             print(value.source)
             print('Destination')
             print(value.destination)
-            print('Start')
-            print(value.start_rs)
-            print('End')
-            print(value.end_rs)
-            print('Duration')
-            print(value.duration_s)
+            print('Bytes sent')
+            print(value.bytes_sent)
+            print('Bytes recv')
+            print(value.bytes_recv)
+            print('Total bytes')
+            print(value.total_bytes)
 
     # TODO: Results logger (loop through connections dictionary)
     # TODO: Print results for Section A, B, C, and D
