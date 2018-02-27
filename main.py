@@ -5,7 +5,7 @@ import time
 import pcapy
 
 connections = {}
-initial_time_s = time.time()
+initial_packet_ts = 0
 
 class ConnectionState:
     '''
@@ -25,12 +25,16 @@ class ConnectionInfo:
     Class is used as the dictionary item.
     TODO: Add explanation for ConnectionInfo object.
     '''
-    def __init__(self, state, source, destination, start_s, packets_sent, bytes_sent):
+    def __init__(self, state, source, destination, start_s, start_rs, packets_sent, bytes_sent):
         self.state = state
         self.source = source
         self.destination = destination
         self.start_s = start_s
+        # Relative
+        self.start_rs = start_rs
         self.end_s = 0
+        # Relative
+        self.end_rs = 0
         self.duration_s = 0
         self.packets_sent = packets_sent
         self.packets_recv = 0
@@ -71,6 +75,10 @@ def packet_parser(header, data):
     options_size = len(tcp_header.get_options())
     timestamp = header.getts()[0] + (header.getts()[1] / 1000000)
 
+    global initial_packet_ts
+    if not initial_packet_ts:
+        initial_packet_ts = timestamp
+
     SYN = tcp_header.get_SYN()
     ACK = tcp_header.get_ACK()
     FIN = tcp_header.get_FIN()
@@ -78,7 +86,7 @@ def packet_parser(header, data):
 
     if not connections.has_key(connection_id):
         connection_state = ConnectionState(SYN, ACK, FIN, RST)
-        connection_info = ConnectionInfo(connection_state, source, destination, timestamp, 1, options_size)
+        connection_info = ConnectionInfo(connection_state, source, destination, timestamp, timestamp % initial_packet_ts, 1, options_size)
         connections[connection_id] = connection_info
     else:
         connection_info = connections[connection_id]
@@ -99,9 +107,10 @@ def packet_parser(header, data):
         if not connection_info.state.is_reset and connection_info.state.RST:
             connection_info.state.is_reset = True
 
-        # Update end connection time on last FIN
+        # Update connection duration time for each FIN
         if FIN:
             connection_info.end_s = timestamp
+            connection_info.end_rs = timestamp % initial_packet_ts
             connection_info.duration_s = connection_info.end_s - connection_info.start_s
 
         # Update packets for source and destination
@@ -136,6 +145,10 @@ def main():
             print(value.source)
             print('Destination')
             print(value.destination)
+            print('Start')
+            print(value.start_rs)
+            print('End')
+            print(value.end_rs)
             print('Duration')
             print(value.duration_s)
 
