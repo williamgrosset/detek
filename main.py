@@ -77,7 +77,6 @@ def packet_parser(pc, connections, initial_pckt_ts):
         destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
         connection_id = ConnectionId(source, destination)
 
-        # TODO: Verify amount for bytes sent/recv
         options_size = 0
         for option in tcp_header.get_options():
             options_size += option.get_size()
@@ -118,16 +117,19 @@ def packet_parser(pc, connections, initial_pckt_ts):
             # If state is at least S1F1, connection is complete
             if not connection_info.state.is_complete and connection_info.state.SYN and connection_info.state.FIN:
                 connection_info.state.is_complete = True
+            # update_flags(connection_info, SYN, ACK, FIN RST)
 
             # If RST flag is set, connection has been reset
             if not connection_info.state.is_reset and connection_info.state.RST:
                 connection_info.state.is_reset = True
+            # update_state_flags(connections, SYN, ACK, FIN RST)
 
             # Update connection duration time for each FIN
             if FIN:
                 connection_info.end_ts = pckt_ts
                 connection_info.end_rs = pckt_ts % initial_pckt_ts
                 connection_info.duration_s = connection_info.end_ts - connection_info.start_ts
+            # update_connection_duration(connection_info, pckts_ts, initial_pckt_ts)
 
             # Update packets for source and destination
             if source == connection_info.source:
@@ -137,13 +139,14 @@ def packet_parser(pc, connections, initial_pckt_ts):
 
             connection_info.total_pckts += 1
 
-            # TODO: Verify formula - Update bytes for source and destination
+            # TODO: Update bytes for source and destination
             if source == connection_info.source:
                 connection_info.bytes_sent += options_size
             else:
                 connection_info.bytes_recv += options_size
 
             connection_info.total_bytes += options_size
+            # update_total_data(connection_info, source, options_size)
 
             connections[connection_id] = connection_info
 
