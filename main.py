@@ -2,7 +2,6 @@ from __future__ import division
 from impacket import ImpactDecoder
 from impacket import ImpactPacket
 import sys
-import time
 import pcapy
 
 class ConnectionState:
