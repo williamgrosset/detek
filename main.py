@@ -57,6 +57,27 @@ class ConnectionId:
     def __hash__(self):
         return (hash(self.peer1[0]) ^ hash(self.peer2[1]) ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
 
+def update_state_flags(connection_info, SYN, ACK, FIN, RST):
+    # Update state flags
+    connection_info.state.SYN += SYN
+    connection_info.state.ACK += ACK
+    connection_info.state.FIN += FIN
+    connection_info.state.RST += RST
+
+    # If state is at least S1F1, connection is complete
+    if not connection_info.state.is_complete and connection_info.state.SYN and connection_info.state.FIN:
+        connection_info.state.is_complete = True
+
+    # If RST flag is set, connection has been reset
+    if not connection_info.state.is_reset and connection_info.state.RST:
+        connection_info.state.is_reset = True
+
+def update_connection_duration(connection_info, pckt_ts, initial_pckt_ts):
+    connection_info.end_ts = pckt_ts
+    connection_info.end_rs = pckt_ts % initial_pckt_ts
+    connection_info.duration_s = connection_info.end_ts - connection_info.start_ts
+
+
 def packet_parser(pc, connections, initial_pckt_ts):
     pckt = pc.next()
 
@@ -108,28 +129,11 @@ def packet_parser(pc, connections, initial_pckt_ts):
 
             # TODO: Split each ConnectionInfo modifier into own method
 
-            # Update state flags
-            connection_info.state.SYN += SYN
-            connection_info.state.ACK += ACK
-            connection_info.state.FIN += FIN
-            connection_info.state.RST += RST
-
-            # If state is at least S1F1, connection is complete
-            if not connection_info.state.is_complete and connection_info.state.SYN and connection_info.state.FIN:
-                connection_info.state.is_complete = True
-            # update_flags(connection_info, SYN, ACK, FIN RST)
-
-            # If RST flag is set, connection has been reset
-            if not connection_info.state.is_reset and connection_info.state.RST:
-                connection_info.state.is_reset = True
-            # update_state_flags(connections, SYN, ACK, FIN RST)
+            update_state_flags(connection_info, SYN, ACK, FIN, RST)
 
             # Update connection duration time for each FIN
             if FIN:
-                connection_info.end_ts = pckt_ts
-                connection_info.end_rs = pckt_ts % initial_pckt_ts
-                connection_info.duration_s = connection_info.end_ts - connection_info.start_ts
-            # update_connection_duration(connection_info, pckts_ts, initial_pckt_ts)
+                update_connection_duration(connection_info, pckt_ts, initial_pckt_ts)
 
             # Update packets for source and destination
             if source == connection_info.source:
