@@ -5,8 +5,7 @@ import pcapy
 
 class ConnectionState:
     '''
-    Class represents the state of the connection and
-    contains a counter for the SYN, ACK, FIN, and RST flags.
+    Class represents the state of the connection and contains a counter for the SYN, ACK, FIN, and RST flags.
     Used as part of the ConnectionInfo class.
     '''
     def __init__(self, SYN, ACK, FIN, RST):
