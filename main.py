@@ -22,20 +22,18 @@ class ConnectionInfo:
     Class is used as the dictionary item.
     TODO: Add explanation for ConnectionInfo object.
     '''
-    def __init__(self, state, source, destination, start_s, start_rs, packets_sent, bytes_sent):
+    def __init__(self, state, source, destination, start_ts, start_rs, pckts_sent, bytes_sent):
         self.state = state
         self.source = source
         self.destination = destination
-        self.start_s = start_s
-        # Relative
+        self.start_ts = start_ts
         self.start_rs = start_rs
-        self.end_s = 0
-        # Relative
+        self.end_ts = 0
         self.end_rs = 0
         self.duration_s = 0
-        self.packets_sent = packets_sent
-        self.packets_recv = 0
-        self.total_packets = self.packets_sent + self.packets_recv
+        self.pckts_sent = pckts_sent
+        self.pckts_recv = 0
+        self.total_pckts = self.pckts_sent + self.pckts_recv
         self.bytes_sent = bytes_sent
         self.bytes_recv = 0
         self.total_bytes = self.bytes_sent + self.bytes_recv
@@ -127,17 +125,17 @@ def packet_parser(pc, connections, initial_pckt_ts):
 
             # Update connection duration time for each FIN
             if FIN:
-                connection_info.end_s = pckt_ts
+                connection_info.end_ts = pckt_ts
                 connection_info.end_rs = pckt_ts % initial_pckt_ts
-                connection_info.duration_s = connection_info.end_s - connection_info.start_s
+                connection_info.duration_s = connection_info.end_ts - connection_info.start_ts
 
             # Update packets for source and destination
             if source == connection_info.source:
-                connection_info.packets_sent += 1
+                connection_info.pckts_sent += 1
             else:
-                connection_info.packets_recv += 1
+                connection_info.pckts_recv += 1
 
-            connection_info.total_packets += 1
+            connection_info.total_pckts += 1
 
             # TODO: Verify formula - Update bytes for source and destination
             if source == connection_info.source:
