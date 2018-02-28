@@ -60,7 +60,7 @@ class ConnectionId:
     def __hash__(self):
         return (hash(self.peer1[0]) ^ hash(self.peer2[1]) ^ hash(self.peer2[0]) ^ hash(self.peer2[1]))
 
-def packet_parser(pc, connections, initial_packet_ts):
+def packet_parser(pc, connections, initial_pckt_ts):
     pckt = pc.next()
 
     while pckt:
@@ -68,26 +68,27 @@ def packet_parser(pc, connections, initial_packet_ts):
         data = pckt[1]
 
         decoder = ImpactDecoder.EthDecoder()
-        ethernet_packet = decoder.decode(data)
+        ethernet_pckt = decoder.decode(data)
 
-        if ethernet_packet.get_ether_type() != ImpactPacket.IP.ethertype:
+        if ethernet_pckt.get_ether_type() != ImpactPacket.IP.ethertype:
             return
 
-        ip_header = ethernet_packet.child()
+        ip_header = ethernet_pckt.child()
         tcp_header = ip_header.child()
 
         source = (ip_header.get_ip_src(), tcp_header.get_th_sport())
         destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
         connection_id = ConnectionId(source, destination)
+
         # TODO: Verify amount for bytes sent/recv
         options_size = 0
         for option in tcp_header.get_options():
             options_size += option.get_size()
 
-        timestamp = header.getts()[0] + (header.getts()[1] / 1000000)
+        pckt_ts = header.getts()[0] + (header.getts()[1] / 1000000)
 
-        if not initial_packet_ts:
-            initial_packet_ts = timestamp
+        if not initial_pckt_ts:
+            initial_pckt_ts = pckt_ts
 
         SYN = tcp_header.get_SYN()
         ACK = tcp_header.get_ACK()
@@ -96,7 +97,15 @@ def packet_parser(pc, connections, initial_packet_ts):
 
         if not connections.has_key(connection_id):
             connection_state = ConnectionState(SYN, ACK, FIN, RST)
-            connection_info = ConnectionInfo(connection_state, source, destination, timestamp, timestamp % initial_packet_ts, 1, options_size)
+            connection_info = ConnectionInfo(
+                                connection_state,
+                                source,
+                                destination,
+                                pckt_ts,
+                                pckt_ts % initial_pckt_ts,
+                                1,
+                                options_size
+                              )
             connections[connection_id] = connection_info
         else:
             connection_info = connections[connection_id]
@@ -119,8 +128,8 @@ def packet_parser(pc, connections, initial_packet_ts):
 
             # Update connection duration time for each FIN
             if FIN:
-                connection_info.end_s = timestamp
-                connection_info.end_rs = timestamp % initial_packet_ts
+                connection_info.end_s = pckt_ts
+                connection_info.end_rs = pckt_ts % initial_pckt_ts
                 connection_info.duration_s = connection_info.end_s - connection_info.start_s
 
             # Update packets for source and destination
@@ -148,10 +157,9 @@ def main():
     pc = pcapy.open_offline(sys.argv[1])
     pc.setfilter('tcp')
 
-    # TODO: pass additional args (connections, begin_s) to callback
     connections = {}
-    initial_packet_ts = 0
-    packet_parser(pc, connections, initial_packet_ts)
+    initial_pckt_ts = 0
+    packet_parser(pc, connections, initial_pckt_ts)
 
     for key, value in connections.iteritems():
         if value.state.is_complete:
