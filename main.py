@@ -1,6 +1,5 @@
 from __future__ import division
-from impacket import ImpactDecoder
-from impacket import ImpactPacket
+from impacket import ImpactDecoder, ImpactPacket
 import sys
 import pcapy
 
