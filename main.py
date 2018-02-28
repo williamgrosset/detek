@@ -19,8 +19,23 @@ class ConnectionState:
 
 class ConnectionInfo:
     '''
-    Class is used as the dictionary item.
-    TODO: Add explanation for ConnectionInfo object.
+    Class contains information for a connection.
+    Used as the connections dictionary item.
+
+    state: ConnectionState class,
+    source: (IP addressm, port),
+    destination: (IP address, port),
+    start_ts: packet timestamp (seconds),
+    start_rs: relative start to initial packet (seconds),
+    end_ts: packet timestamp (seconds),
+    end_rs: relative end to initial packet (seconds),
+    duration_s: duration of connection (seconds),
+    pckts_sent: packets sent from source to destination (bytes),
+    pckts_recv: packets sent from destination to source (bytes),
+    total_pckts: total packets in connection (bytes),
+    bytes_sent: data bytes sent from source to destination (bytes),
+    bytes_recv: data bytes sent from destination to source (bytes),
+    total_bytes: total data bytes in connection (bytes)
     '''
     def __init__(self, state, source, destination, start_ts, start_rs, pckts_sent, bytes_sent):
         self.state = state
@@ -40,8 +55,11 @@ class ConnectionInfo:
 
 class ConnectionId:
     '''
-    Class is used as a dictionary key.
-    TODO: Add explanation for ConnectionId object.
+    Class uniquely identifies a connection (duplex support: (p1, p2) == (p2, p1)).
+    Used as the connections dictionary key.
+
+    peer1: (IP address, port),
+    peer2: (IP address, port)
     '''
     def __init__(self, peer1, peer2):
         self.peer1 = peer1
