@@ -72,11 +72,28 @@ def update_state_flags(connection_info, SYN, ACK, FIN, RST):
     if not connection_info.state.is_reset and connection_info.state.RST:
         connection_info.state.is_reset = True
 
-def update_connection_duration(connection_info, pckt_ts, initial_pckt_ts):
-    connection_info.end_ts = pckt_ts
-    connection_info.end_rs = pckt_ts % initial_pckt_ts
-    connection_info.duration_s = connection_info.end_ts - connection_info.start_ts
+def update_connection_duration(connection_info, pckt_ts, initial_pckt_ts, FIN):
+    if FIN:
+        connection_info.end_ts = pckt_ts
+        connection_info.end_rs = pckt_ts % initial_pckt_ts
+        connection_info.duration_s = connection_info.end_ts - connection_info.start_ts
 
+def update_total_data_transfer(connection_info, source, options_size):
+    # Update packets for source and destination
+    if source == connection_info.source:
+        connection_info.pckts_sent += 1
+    else:
+        connection_info.pckts_recv += 1
+
+    connection_info.total_pckts += 1
+
+    # TODO: Update bytes for source and destination
+    if source == connection_info.source:
+        connection_info.bytes_sent += options_size
+    else:
+        connection_info.bytes_recv += options_size
+
+    connection_info.total_bytes += options_size
 
 def packet_parser(pc, connections, initial_pckt_ts):
     pckt = pc.next()
@@ -127,30 +144,9 @@ def packet_parser(pc, connections, initial_pckt_ts):
         else:
             connection_info = connections[connection_id]
 
-            # TODO: Split each ConnectionInfo modifier into own method
-
             update_state_flags(connection_info, SYN, ACK, FIN, RST)
-
-            # Update connection duration time for each FIN
-            if FIN:
-                update_connection_duration(connection_info, pckt_ts, initial_pckt_ts)
-
-            # Update packets for source and destination
-            if source == connection_info.source:
-                connection_info.pckts_sent += 1
-            else:
-                connection_info.pckts_recv += 1
-
-            connection_info.total_pckts += 1
-
-            # TODO: Update bytes for source and destination
-            if source == connection_info.source:
-                connection_info.bytes_sent += options_size
-            else:
-                connection_info.bytes_recv += options_size
-
-            connection_info.total_bytes += options_size
-            # update_total_data(connection_info, source, options_size)
+            update_connection_duration(connection_info, pckt_ts, initial_pckt_ts, FIN)
+            update_total_data_transfer(connection_info, source, options_size)
 
             connections[connection_id] = connection_info
 
