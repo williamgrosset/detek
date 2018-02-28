@@ -73,6 +73,7 @@ def update_state_flags(connection_info, SYN, ACK, FIN, RST):
         connection_info.state.is_reset = True
 
 def update_connection_duration(connection_info, pckt_ts, initial_pckt_ts, FIN):
+    # Update connection duration for last FIN
     if FIN:
         connection_info.end_ts = pckt_ts
         connection_info.end_rs = pckt_ts % initial_pckt_ts
