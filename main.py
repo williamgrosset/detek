@@ -170,15 +170,7 @@ def packet_parser(pc, connections, initial_pckt_ts):
 
         pckt = pc.next()
 
-def main():
-    # TODO: Error handling for file type
-    pc = pcapy.open_offline(sys.argv[1])
-    pc.setfilter('tcp')
-
-    connections = {}
-    initial_pckt_ts = 0
-    packet_parser(pc, connections, initial_pckt_ts)
-
+def result_logger(connections):
     for key, value in connections.iteritems():
         if value.state.is_complete:
             print('Source')
@@ -197,6 +189,17 @@ def main():
             print(value.end_rs)
             print('Duration')
             print(value.duration_s)
+
+def main():
+    # TODO: Error handling for file type
+    pc = pcapy.open_offline(sys.argv[1])
+    pc.setfilter('tcp')
+
+    connections = {}
+    initial_pckt_ts = 0
+    packet_parser(pc, connections, initial_pckt_ts)
+
+    result_logger(connections)
 
     # TODO: Results logger (loop through connections dictionary)
     # TODO: Print results for Section A, B, C, and D
