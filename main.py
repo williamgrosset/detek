@@ -188,9 +188,9 @@ def print_connection_details(connection, count):
         print('Number of packets sent from Source to Destination: %i' % connection.pckts_sent)
         print('Number of packets sent from Destination to Source: %i' % connection.pckts_recv)
         print('Total number of packets: %i' % connection.total_pckts)
-        print('Number of data bytes sent from Source to Destination:')
-        print('Number of data bytes sent from Destination to Source:')
-        print('Total number of data bytes:')
+        print('Number of data bytes sent from Source to Destination: %i' % connection.bytes_sent)
+        print('Number of data bytes sent from Destination to Source: %i' % connection.bytes_recv)
+        print('Total number of data bytes: %i' % connection.total_bytes)
 
     print('')
 
