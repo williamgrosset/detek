@@ -170,31 +170,35 @@ def packet_parser(pc, connections, initial_pckt_ts):
 
         pckt = pc.next()
 
-def print_connection_details(connection, count):
-    source = connection.source
-    destination = connection.destination
-    status = 'R' if connection.state.is_reset else 'S%sF%s' % (connection.state.SYN, connection.state.FIN)
+def print_connection_details(connections):
+    count = 0
 
-    print('++++++++++++++++++++++++++++++++++++++++++++++++')
-    print('Connection %i:' % count)
-    print('Source Address: %s' % source[0])
-    print('Destination Address: %s' % destination[0])
-    print('Source Port: %s' % source[1])
-    print('Destination Port: %s' % destination[1])
-    print('Status: %s' % status)
-    if connection.state.is_complete:
-        print('Start Time: %fs' % connection.start_rs)
-        print('End Time: %fs' % connection.end_rs)
-        print('Duration: %fs' % connection.duration_s)
-        print('Number of packets sent from Source to Destination: %i' % connection.pckts_sent)
-        print('Number of packets sent from Destination to Source: %i' % connection.pckts_recv)
-        print('Total number of packets: %i' % connection.total_pckts)
-        print('Number of data bytes sent from Source to Destination: %i' % connection.bytes_sent)
-        print('Number of data bytes sent from Destination to Source: %i' % connection.bytes_recv)
-        print('Total number of data bytes: %i' % connection.total_bytes)
+    for key, connection in connections.iteritems():
+        source = connection.source
+        destination = connection.destination
+        status = 'R' if connection.state.is_reset else 'S%sF%s' % (connection.state.SYN, connection.state.FIN)
 
-    print('++++++++++++++++++++++++++++++++++++++++++++++++')
-    print('')
+        print('++++++++++++++++++++++++++++++++++++++++++++++++')
+        print('Connection %i:' % count)
+        print('Source Address: %s' % source[0])
+        print('Destination Address: %s' % destination[0])
+        print('Source Port: %s' % source[1])
+        print('Destination Port: %s' % destination[1])
+        print('Status: %s' % status)
+        if connection.state.is_complete:
+            print('Start Time: %fs' % connection.start_rs)
+            print('End Time: %fs' % connection.end_rs)
+            print('Duration: %fs' % connection.duration_s)
+            print('Number of packets sent from Source to Destination: %i' % connection.pckts_sent)
+            print('Number of packets sent from Destination to Source: %i' % connection.pckts_recv)
+            print('Total number of packets: %i' % connection.total_pckts)
+            print('Number of data bytes sent from Source to Destination: %i' % connection.bytes_sent)
+            print('Number of data bytes sent from Destination to Source: %i' % connection.bytes_recv)
+            print('Total number of data bytes: %i' % connection.total_bytes)
+
+        print('++++++++++++++++++++++++++++++++++++++++++++++++')
+        print('')
+        count += 1
 
 def print_general_info(connections):
     complete_connections = 0
@@ -225,9 +229,7 @@ def result_logger(connections):
 
     print("B) Connections' details:")
     print('')
-    for key, value in connections.iteritems():
-        print_connection_details(value, i)
-        i += 1
+    print_connection_details(connections)
 
     print('C) General')
     print('')
