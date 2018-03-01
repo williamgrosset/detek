@@ -175,6 +175,7 @@ def print_connection_details(connection, count):
     destination = connection.destination
     status = 'R' if connection.state.is_reset else 'S%sF%s' % (connection.state.SYN, connection.state.FIN)
 
+    print('++++++++++++++++++++++++++++++++++++++++++++++++')
     print('Connection %i:' % count)
     print('Source Address: %s' % source[0])
     print('Destination Address: %s' % destination[0])
@@ -192,11 +193,15 @@ def print_connection_details(connection, count):
         print('Number of data bytes sent from Destination to Source: %i' % connection.bytes_recv)
         print('Total number of data bytes: %i' % connection.total_bytes)
 
+    print('++++++++++++++++++++++++++++++++++++++++++++++++')
     print('')
 
 
 def result_logger(connections):
     i = 1
+
+    print("B) Connections' details:")
+    print('')
     for key, value in connections.iteritems():
         print_connection_details(value, i)
         i += 1
