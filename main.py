@@ -196,6 +196,26 @@ def print_connection_details(connection, count):
     print('++++++++++++++++++++++++++++++++++++++++++++++++')
     print('')
 
+def print_general_info(connections):
+    complete_connections = 0
+    reset_connections = 0
+    reset_connections_open = 0
+
+    for key, connection in connections.iteritems():
+        if connection.state.is_complete:
+            complete_connections += 1
+
+        if connection.state.is_reset:
+            reset_connections += 1
+
+        if not connection.state.is_complete and connection.state.is_reset:
+            reset_connections_open += 1
+
+    print('Total number of complete TCP connections: %i' % complete_connections)
+    print('Number of reset TCP connections: %i' % reset_connections)
+    print('Number of reset TCP connections that were still open when the trace capture ended: %i'
+            % reset_connections_open)
+
 
 def result_logger(connections):
     i = 1
@@ -208,6 +228,10 @@ def result_logger(connections):
     for key, value in connections.iteritems():
         print_connection_details(value, i)
         i += 1
+
+    print('C) General')
+    print('')
+    print_general_info(connections)
 
 def main():
     # TODO: Error handling for file type
