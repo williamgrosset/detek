@@ -173,13 +173,14 @@ def packet_parser(pc, connections, initial_pckt_ts):
 def print_connection_details(connection, count):
     source = connection.source
     destination = connection.destination
+    status = 'R' if connection.state.is_reset else 'S%sF%s' % (connection.state.SYN, connection.state.FIN)
 
     print('Connection %i:' % count)
     print('Source Address: %s' % source[0])
     print('Destination Address: %s' % destination[0])
     print('Source Port: %s' % source[1])
     print('Destination Port: %s' % destination[1])
-    print('Status:')
+    print('Status: %s' % status)
     if connection.state.is_complete:
         print('Start Time')
         print('End Time')
