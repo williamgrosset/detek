@@ -170,25 +170,32 @@ def packet_parser(pc, connections, initial_pckt_ts):
 
         pckt = pc.next()
 
+def print_connection_details(connection, count):
+    print('Connection %i:' % count)
+    print('Source Address:')
+    print('Destination Address:')
+    print('Source Port:')
+    print('Destination Port:')
+    print('Status:')
+    if connection.state.is_complete:
+        print('Start Time')
+        print('End Time')
+        print('Duration')
+        print('Number of packets sent from Source to Destination:')
+        print('Number of packets sent from Destination to Source:')
+        print('Total number of packets:')
+        print('Number of data bytes sent from Source to Destination:')
+        print('Number of data bytes sent from Destination to Source:')
+        print('Total number of data bytes:')
+
+    print('')
+
+
 def result_logger(connections):
+    i = 1
     for key, value in connections.iteritems():
-        if value.state.is_complete:
-            print('Source')
-            print(value.source)
-            print('Destination')
-            print(value.destination)
-            print('Bytes sent')
-            print(value.bytes_sent)
-            print('Bytes recv')
-            print(value.bytes_recv)
-            print('Total bytes')
-            print(value.total_bytes)
-            print('Start')
-            print(value.start_rs)
-            print('End')
-            print(value.end_rs)
-            print('Duration')
-            print(value.duration_s)
+        print_connection_details(value, i)
+        i += 1
 
 def main():
     # TODO: Error handling for file type
