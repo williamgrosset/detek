@@ -200,6 +200,9 @@ def print_connection_details(connection, count):
 def result_logger(connections):
     i = 1
 
+    print('A) Total number of connections: %i' % len(connections))
+    print('')
+
     print("B) Connections' details:")
     print('')
     for key, value in connections.iteritems():
