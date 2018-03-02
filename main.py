@@ -222,8 +222,6 @@ def print_general_info(connections):
 
 
 def result_logger(connections):
-    i = 1
-
     print('A) Total number of connections: %i' % len(connections))
     print('')
 
@@ -242,8 +240,8 @@ def main():
 
     connections = {}
     initial_pckt_ts = 0
-    packet_parser(pc, connections, initial_pckt_ts)
 
+    packet_parser(pc, connections, initial_pckt_ts)
     result_logger(connections)
 
     # TODO: Results logger (loop through connections dictionary)
