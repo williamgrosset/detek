@@ -173,7 +173,8 @@ def packet_parser(pc, connections, initial_pckt_ts):
 def print_connection_details(connections):
     count = 1
 
-    for key, connection in connections.iteritems():
+    for key, connection in sorted(connections.iteritems(), key=lambda
+            (connection_id, connection_info): (connection_info.source[1], connection_id)):
         source = connection.source
         destination = connection.destination
         status = 'R' if connection.state.is_reset else 'S%sF%s' % (connection.state.SYN, connection.state.FIN)
