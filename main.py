@@ -171,7 +171,7 @@ def packet_parser(pc, connections, initial_pckt_ts):
         pckt = pc.next()
 
 def print_connection_details(connections):
-    count = 0
+    count = 1
 
     for key, connection in connections.iteritems():
         source = connection.source
