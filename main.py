@@ -227,6 +227,29 @@ def result_logger(connections):
     print('Number of reset TCP connections: %i' % reset_connections)
     print('Number of reset TCP connections that were still open when the trace capture ended: %i'
             % reset_connections_open)
+    print('')
+
+    print('D) Complete TCP connections')
+    print('')
+    print('Minimum time duration:')
+    print('Mean time duration:')
+    print('Maximum time duration:')
+    print('')
+
+    print('Minimum RTT value:')
+    print('Mean RTT value:')
+    print('Maximum RTT value:')
+    print('')
+
+    print('Minimum number of packets including both send/received:')
+    print('Mean number of packets including both send/received:')
+    print('Maximum number of packets including both send/received:')
+    print('')
+    
+    print('Minimum receive window size including both send/received:')
+    print('Mean receive window size including both send/received:')
+    print('Maximum receive window size including both send/received:')
+    print('')
 
 def main():
     # TODO: Error handling for file type
