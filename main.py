@@ -170,9 +170,17 @@ def packet_parser(pc, connections, initial_pckt_ts):
 
         pckt = pc.next()
 
-def print_connection_details(connections):
+def result_logger(connections):
+    complete_connections = 0
+    reset_connections = 0
+    reset_connections_open = 0
     count = 1
 
+    print('A) Total number of connections: %i' % len(connections))
+    print('')
+
+    print("B) Connections' details:")
+    print('')
     for key, connection in sorted(connections.iteritems(), key=lambda
             (connection_id, connection_info): (connection_info.source[1], connection_id)):
         source = connection.source
@@ -201,40 +209,24 @@ def print_connection_details(connections):
 
         print('++++++++++++++++++++++++++++++++++++++++++++++++')
         print('')
-        count += 1
 
-def print_general_info(connections):
-    complete_connections = 0
-    reset_connections = 0
-    reset_connections_open = 0
-
-    for key, connection in connections.iteritems():
         if connection.state.is_complete:
             complete_connections += 1
 
         if connection.state.is_reset:
             reset_connections += 1
 
-        if not connection.state.is_complete and connection.state.is_reset:
-            reset_connections_open += 1
+            if connection.state.SYN > connection.state.FIN:
+                reset_connections_open += 1
 
+        count += 1
+
+    print('C) General')
+    print('')
     print('Total number of complete TCP connections: %i' % complete_connections)
     print('Number of reset TCP connections: %i' % reset_connections)
     print('Number of reset TCP connections that were still open when the trace capture ended: %i'
             % reset_connections_open)
-
-
-def result_logger(connections):
-    print('A) Total number of connections: %i' % len(connections))
-    print('')
-
-    print("B) Connections' details:")
-    print('')
-    print_connection_details(connections)
-
-    print('C) General')
-    print('')
-    print_general_info(connections)
 
 def main():
     # TODO: Error handling for file type
