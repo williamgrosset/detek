@@ -221,7 +221,7 @@ def result_logger(connections):
 
         count += 1
 
-    print('C) General')
+    print('C) General:')
     print('')
     print('Total number of complete TCP connections: %i' % complete_connections)
     print('Number of reset TCP connections: %i' % reset_connections)
@@ -229,7 +229,7 @@ def result_logger(connections):
             % reset_connections_open)
     print('')
 
-    print('D) Complete TCP connections')
+    print('D) Complete TCP connections:')
     print('')
     print('Minimum time duration:')
     print('Mean time duration:')
@@ -262,8 +262,7 @@ def main():
     packet_parser(pc, connections, initial_pckt_ts)
     result_logger(connections)
 
-    # TODO: Results logger (loop through connections dictionary)
-    # TODO: Print results for Section A, B, C, and D
+    # TODO: Print results for each Section A, B, C, and D
 
 if __name__ == '__main__':
     main()
