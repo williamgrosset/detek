@@ -177,7 +177,9 @@ def print_connection_details(connections):
             (connection_id, connection_info): (connection_info.source[1], connection_id)):
         source = connection.source
         destination = connection.destination
-        status = 'R' if connection.state.is_reset else 'S%sF%s' % (connection.state.SYN, connection.state.FIN)
+        status = 'S%sF%s' % (connection.state.SYN, connection.state.FIN)
+        if connection.state.is_reset:
+            status += ' + R'
 
         print('++++++++++++++++++++++++++++++++++++++++++++++++')
         print('Connection %i:' % count)
