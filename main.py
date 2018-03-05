@@ -35,6 +35,8 @@ class ConnectionInfo:
     bytes_sent: data bytes sent from source to destination,
     bytes_recv: data bytes sent from destination to source,
     total_bytes: total data bytes in connection,
+    rtt_dict: dictionary for SEQ # + data bytes mapping to timestamp (used for rtt_list),
+    rtt_list: list of all round-trip times (RTT) (seconds),
     window_size_list: list of all window sizes (bytes)
     '''
     def __init__(self, state, source, destination, start_ts, start_rs, packets_sent, bytes_sent, window_size):
@@ -52,6 +54,8 @@ class ConnectionInfo:
         self.bytes_sent = bytes_sent
         self.bytes_recv = 0
         self.total_bytes = self.bytes_sent + self.bytes_recv
+        self.rtt_dict = {}
+        self.rtt_list = []
         self.window_size_list = [window_size]
 
 class ConnectionId:
@@ -149,6 +153,7 @@ def packet_parser(pc, connections, initial_packet_ts):
         FIN = tcp_header.get_FIN()
         RST = tcp_header.get_RST()
 
+        connection_info = ()
         if not connections.has_key(connection_id):
             connection_state = ConnectionState(SYN, ACK, FIN, RST)
             connection_info = ConnectionInfo(
@@ -161,7 +166,6 @@ def packet_parser(pc, connections, initial_packet_ts):
                                 data_bytes,
                                 window_size
                               )
-            connections[connection_id] = connection_info
         else:
             connection_info = connections[connection_id]
 
@@ -170,7 +174,14 @@ def packet_parser(pc, connections, initial_packet_ts):
             update_total_data_transfer(connection_info, source, data_bytes)
             update_window_size_list(connection_info, window_size)
 
-            connections[connection_id] = connection_info
+        connection_info.rtt_dict[tcp_header.get_th_seq() + data_bytes] = packet_ts
+
+        if connection_info.rtt_dict.has_key(tcp_header.get_th_ack()):
+            ts = connection_info.rtt_dict[tcp_header.get_th_ack()]
+            connection_info.rtt_list.append(packet_ts - ts)
+
+        connections[connection_id] = connection_info
+
 
         packet = pc.next()
 
@@ -184,6 +195,10 @@ def result_logger(connections):
     sum_packets = 0
     min_packets = sys.maxsize
     max_packets = 0
+    sum_rtt = 0
+    min_rtt = sys.maxsize
+    max_rtt = 0
+    total_rtts = 0
     sum_window_size = 0
     min_window_size = sys.maxsize
     max_window_size = 0
@@ -229,6 +244,12 @@ def result_logger(connections):
             min_packets = min(min_packets, connection.total_packets)
             max_packets = max(max_packets, connection.total_packets)
 
+            total_rtts += len(connection.rtt_list)
+            for rtt in connection.rtt_list:
+                sum_rtt += rtt
+                min_rtt = min(min_rtt, rtt)
+                max_rtt = max(max_rtt, rtt)
+
             total_windows += len(connection.window_size_list)
             for window_size in connection.window_size_list:
                 sum_window_size += window_size
@@ -264,9 +285,9 @@ def result_logger(connections):
     print('Maximum time duration: %fs' % max_time_dur)
     print('')
 
-    print('Minimum RTT value:')
-    print('Mean RTT value:')
-    print('Maximum RTT value:')
+    print('Minimum RTT value: %fs' % min_rtt)
+    print('Mean RTT value: %fs' % (sum_rtt / total_rtts))
+    print('Maximum RTT value: %fs' % max_rtt)
     print('')
 
     print('Minimum number of packets including both send/received: %i' % min_packets)
