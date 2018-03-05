@@ -122,6 +122,13 @@ def update_total_data_transfer(connection_info, source, data_bytes):
 def update_window_size_list(connection_info, window_size):
     connection_info.window_size_list.append(window_size)
 
+def update_rtt(connection_info, seq_num, ack_num, data, timestamp):
+    connection_info.rtt_dict[seq_num + data] = timestamp
+
+    if connection_info.rtt_dict.has_key(ack_num):
+        start_ts = connection_info.rtt_dict[ack_num]
+        connection_info.rtt_list.append(timestamp - start_ts)
+
 def packet_parser(pc, connections, initial_packet_ts):
     packet = pc.next()
 
@@ -168,20 +175,13 @@ def packet_parser(pc, connections, initial_packet_ts):
                               )
         else:
             connection_info = connections[connection_id]
-
             update_state_flags(connection_info, SYN, ACK, FIN, RST)
             update_connection_duration(connection_info, packet_ts, initial_packet_ts, FIN)
             update_total_data_transfer(connection_info, source, data_bytes)
             update_window_size_list(connection_info, window_size)
 
-        connection_info.rtt_dict[tcp_header.get_th_seq() + data_bytes] = packet_ts
-
-        if connection_info.rtt_dict.has_key(tcp_header.get_th_ack()):
-            ts = connection_info.rtt_dict[tcp_header.get_th_ack()]
-            connection_info.rtt_list.append(packet_ts - ts)
-
+        update_rtt(connection_info, tcp_header.get_th_seq(), tcp_header.get_th_ack(), data_bytes, packet_ts)
         connections[connection_id] = connection_info
-
 
         packet = pc.next()
 
@@ -310,12 +310,10 @@ def main():
         return -1
 
     connections = {}
-    initial_packet_ts = 0
+    initial_packet_ts = 0.0
 
     packet_parser(pc, connections, initial_packet_ts)
     result_logger(connections)
-
-    # TODO: Print results for each Section A, B, C, and D
 
 if __name__ == '__main__':
     main()
