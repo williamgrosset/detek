@@ -111,7 +111,7 @@ def update_total_data_transfer(connection_info, source, data_bytes):
 
     connection_info.total_packets += 1
 
-    # TODO: Update bytes for source and destination
+    # Update bytes for source and destination
     if source == connection_info.source:
         connection_info.bytes_sent += data_bytes
     else:
