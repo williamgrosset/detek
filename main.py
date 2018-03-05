@@ -115,6 +115,9 @@ def update_total_data_transfer(connection_info, source, options_size):
 
     connection_info.total_bytes += options_size
 
+def update_window_size_list(connection_info, window_size):
+    connection_info.window_size_list.append(window_size)
+
 def packet_parser(pc, connections, initial_pckt_ts):
     pckt = pc.next()
 
@@ -130,16 +133,14 @@ def packet_parser(pc, connections, initial_pckt_ts):
 
         ip_header = ethernet_pckt.child()
         tcp_header = ip_header.child()
-
+        pckt_ts = header.getts()[0] + (header.getts()[1] / 1000000)
+        options_size = (ip_header.get_ip_len() - (ip_header.get_ip_hl() + tcp_header.get_th_off()) * 4)
+        window_size = tcp_header.get_th_win()
         source = (ip_header.get_ip_src(), tcp_header.get_th_sport())
         destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
         connection_id = ConnectionId(source, destination)
 
-        options_size = (ip_header.get_ip_len() - (ip_header.get_ip_hl() + tcp_header.get_th_off()) * 4)
-        window_size = tcp_header.get_th_win()
-
-        pckt_ts = header.getts()[0] + (header.getts()[1] / 1000000)
-
+        # Set initial relative timestamp
         if not initial_pckt_ts:
             initial_pckt_ts = pckt_ts
 
@@ -167,7 +168,7 @@ def packet_parser(pc, connections, initial_pckt_ts):
             update_state_flags(connection_info, SYN, ACK, FIN, RST)
             update_connection_duration(connection_info, pckt_ts, initial_pckt_ts, FIN)
             update_total_data_transfer(connection_info, source, options_size)
-            connection_info.window_size_list.append(window_size)
+            update_window_size_list(connection_info, window_size)
 
             connections[connection_id] = connection_info
 
