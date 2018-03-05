@@ -239,7 +239,7 @@ def result_logger(connections):
     print('D) Complete TCP connections:')
     print('')
     print('Minimum time duration: %fs' % min_time_dur)
-    print('Mean time duration: %fs' % (sum_time_dur / len(connections)))
+    print('Mean time duration: %fs' % (sum_time_dur / complete_connections))
     print('Maximum time duration: %fs' % max_time_dur)
     print('')
 
