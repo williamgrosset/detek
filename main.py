@@ -213,8 +213,6 @@ def print_connection_details(connection, count):
     print('++++++++++++++++++++++++++++++++++++++++++++++++')
     print('')
 
-    count += 1
-
 def result_logger(connections):
     complete_connections = 0
     reset_connections = 0
