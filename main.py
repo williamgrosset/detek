@@ -22,19 +22,19 @@ class ConnectionInfo:
     Used as the connections dictionary item.
 
     state: ConnectionState class,
-    source: (IP addressm, port),
+    source: (IP address, port),
     destination: (IP address, port),
     start_ts: packet timestamp (seconds),
     start_rs: relative start to initial packet (seconds),
     end_ts: packet timestamp (seconds),
     end_rs: relative end to initial packet (seconds),
     duration_s: duration of connection (seconds),
-    packets_sent: packets sent from source to destination (bytes),
-    packets_recv: packets sent from destination to source (bytes),
-    total_packets: total packets in connection (bytes),
-    bytes_sent: data bytes sent from source to destination (bytes),
-    bytes_recv: data bytes sent from destination to source (bytes),
-    total_bytes: total data bytes in connection (bytes)
+    packets_sent: packets sent from source to destination,
+    packets_recv: packets sent from destination to source,
+    total_packets: total packets in connection,
+    bytes_sent: data bytes sent from source to destination,
+    bytes_recv: data bytes sent from destination to source,
+    total_bytes: total data bytes in connection,
     window_size_list: list of all window sizes (bytes)
     '''
     def __init__(self, state, source, destination, start_ts, start_rs, packets_sent, bytes_sent, window_size):
