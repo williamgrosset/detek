@@ -279,9 +279,13 @@ def result_logger(connections):
     print('')
 
 def main():
-    # TODO: Error handling for file type
-    pc = pcapy.open_offline(sys.argv[1])
-    pc.setfilter('tcp')
+    filename = sys.argv[1]
+    try:
+        pc = pcapy.open_offline(filename)
+        pc.setfilter('tcp')
+    except Exception as e:
+        print('Cannot open capture file: %s' % filename)
+        return -1
 
     connections = {}
     initial_pckt_ts = 0
