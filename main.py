@@ -356,5 +356,7 @@ def main():
     packet_parser(pc, connections, initial_packet_ts)
     result_logger(connections)
 
+    return 0
+
 if __name__ == '__main__':
     main()
