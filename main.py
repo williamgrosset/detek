@@ -175,6 +175,9 @@ def result_logger(connections):
     sum_time_dur = 0
     min_time_dur = sys.maxsize
     max_time_dur = 0
+    sum_pckts = 0
+    min_pckts = sys.maxsize
+    max_pckts = 0
     count = 1
 
     print('A) Total number of connections: %i' % len(connections))
@@ -212,6 +215,10 @@ def result_logger(connections):
             min_time_dur = min(min_time_dur, connection.duration_s)
             max_time_dur = max(max_time_dur, connection.duration_s)
 
+            sum_pckts += connection.total_pckts
+            min_pckts = min(min_pckts, connection.total_pckts)
+            max_pckts = max(max_pckts, connection.total_pckts)
+
         print('++++++++++++++++++++++++++++++++++++++++++++++++')
         print('')
 
@@ -246,9 +253,9 @@ def result_logger(connections):
     print('Maximum RTT value:')
     print('')
 
-    print('Minimum number of packets including both send/received:')
-    print('Mean number of packets including both send/received:')
-    print('Maximum number of packets including both send/received:')
+    print('Minimum number of packets including both send/received: %i' % min_pckts)
+    print('Mean number of packets including both send/received: %f' % (sum_pckts / complete_connections))
+    print('Maximum number of packets including both send/received: %i' % max_pckts)
     print('')
     
     print('Minimum receive window size including both send/received:')
