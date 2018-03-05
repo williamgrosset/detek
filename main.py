@@ -274,11 +274,11 @@ def result_logger(connections):
                 (connection_id, connection_info): (connection_info.source[1], connection_id)):
             print_connection_details(connection, count)
 
-            if connection.state.is_reset:
-                reset_connections += 1
-
             if connection.state.SYN and connection.state.FIN == 0:
                 open_connections += 1
+
+            if connection.state.is_reset:
+                reset_connections += 1
 
             if connection.state.is_complete:
                 complete_connections += 1
@@ -292,16 +292,14 @@ def result_logger(connections):
                 max_packets = max(max_packets, connection.total_packets)
 
                 total_rtts += len(connection.rtt_list)
-                for rtt in connection.rtt_list:
-                    sum_rtt += rtt
-                    min_rtt = min(min_rtt, rtt)
-                    max_rtt = max(max_rtt, rtt)
+                sum_rtt += sum(connection.rtt_list)
+                min_rtt = min(min(connection.rtt_list), min_rtt)
+                max_rtt = max(max(connection.rtt_list), max_rtt)
 
                 total_windows += len(connection.window_size_list)
-                for window_size in connection.window_size_list:
-                    sum_window_size += window_size
-                    min_window_size = min(min_window_size, window_size)
-                    max_window_size = max(max_window_size, window_size)
+                sum_window_size += sum(connection.window_size_list)
+                min_window_size = min(min(connection.window_size_list), min_window_size)
+                max_window_size = max(max(connection.window_size_list), max_window_size)
 
             count += 1
     else:
