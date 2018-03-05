@@ -213,10 +213,19 @@ def print_connection_details(connection, count):
     print('++++++++++++++++++++++++++++++++++++++++++++++++')
     print('')
 
+def print_general_details(complete_connections, reset_connections, open_connections):
+    print('C) General:')
+    print('')
+    print('Total number of complete TCP connections: %i' % complete_connections)
+    print('Number of reset TCP connections: %i' % reset_connections)
+    print('Number of TCP connections that were still open when the trace capture ended: %i'
+            % open_connections)
+    print('')
+
 def result_logger(connections):
     complete_connections = 0
     reset_connections = 0
-    connections_open = 0
+    open_connections = 0
     sum_time_dur = 0
     min_time_dur = sys.maxsize
     max_time_dur = 0
@@ -270,17 +279,11 @@ def result_logger(connections):
             reset_connections += 1
 
         if connection.state.SYN and connection.state.FIN == 0:
-            connections_open += 1
+            open_connections += 1
 
         count += 1
 
-    print('C) General:')
-    print('')
-    print('Total number of complete TCP connections: %i' % complete_connections)
-    print('Number of reset TCP connections: %i' % reset_connections)
-    print('Number of TCP connections that were still open when the trace capture ended: %i'
-            % connections_open)
-    print('')
+    print_general_details(complete_connections, reset_connections, open_connections)
 
     print('D) Complete TCP connections:')
     print('')
