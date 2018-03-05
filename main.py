@@ -173,7 +173,7 @@ def packet_parser(pc, connections, initial_pckt_ts):
 def result_logger(connections):
     complete_connections = 0
     reset_connections = 0
-    reset_connections_open = 0
+    connections_open = 0
     count = 1
 
     print('A) Total number of connections: %i' % len(connections))
@@ -216,8 +216,8 @@ def result_logger(connections):
         if connection.state.is_reset:
             reset_connections += 1
 
-            if connection.state.SYN > connection.state.FIN:
-                reset_connections_open += 1
+        if connection.state.SYN and connection.state.FIN == 0:
+            connections_open += 1
 
         count += 1
 
@@ -225,8 +225,8 @@ def result_logger(connections):
     print('')
     print('Total number of complete TCP connections: %i' % complete_connections)
     print('Number of reset TCP connections: %i' % reset_connections)
-    print('Number of reset TCP connections that were still open when the trace capture ended: %i'
-            % reset_connections_open)
+    print('Number of TCP connections that were still open when the trace capture ended: %i'
+            % connections_open)
     print('')
 
     print('D) Complete TCP connections:')
