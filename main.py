@@ -310,26 +310,30 @@ def result_logger(connections):
 
     print('D) Complete TCP connections:')
     print('')
-    print_time_stats(
-        min_time_dur if not sys.float_info.max else 0,
-        (sum_time_dur / complete_connections) if complete_connections else 0,
-        max_time_dur
-    )
-    print_rtt_stats(
-        min_rtt if not sys.float_info.max else 0,
-        (sum_rtt / total_rtts) if total_rtts else 0,
-        max_rtt
-    )
-    print_packet_stats(
-        min_packets if not sys.maxsize else 0,
-        (sum_packets / complete_connections) if complete_connections else 0,
-        max_packets
-    )
-    print_receive_window_stats(
-        min_window_size if not sys.maxsize else 0,
-        (sum_window_size / total_windows) if total_windows else 0,
-        max_window_size
-    )
+
+    if complete_connections:
+        print_time_stats(
+            min_time_dur,
+            (sum_time_dur / complete_connections) if complete_connections else 0,
+            max_time_dur
+        )
+        print_rtt_stats(
+            min_rtt,
+            (sum_rtt / total_rtts) if total_rtts else 0,
+            max_rtt
+        )
+        print_packet_stats(
+            min_packets,
+            (sum_packets / complete_connections) if complete_connections else 0,
+            max_packets
+        )
+        print_receive_window_stats(
+            min_window_size,
+            (sum_window_size / total_windows) if total_windows else 0,
+            max_window_size
+        )
+    else:
+        print('No complete TCP connections.')
 
 def main():
     filename = sys.argv[1]
