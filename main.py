@@ -35,8 +35,9 @@ class ConnectionInfo:
     bytes_sent: data bytes sent from source to destination (bytes),
     bytes_recv: data bytes sent from destination to source (bytes),
     total_bytes: total data bytes in connection (bytes)
+    window_size_list: list of all window sizes (bytes)
     '''
-    def __init__(self, state, source, destination, start_ts, start_rs, pckts_sent, bytes_sent):
+    def __init__(self, state, source, destination, start_ts, start_rs, pckts_sent, bytes_sent, window_size):
         self.state = state
         self.source = source
         self.destination = destination
@@ -51,6 +52,7 @@ class ConnectionInfo:
         self.bytes_sent = bytes_sent
         self.bytes_recv = 0
         self.total_bytes = self.bytes_sent + self.bytes_recv
+        self.window_size_list = [window_size]
 
 class ConnectionId:
     '''
@@ -134,6 +136,7 @@ def packet_parser(pc, connections, initial_pckt_ts):
         connection_id = ConnectionId(source, destination)
 
         options_size = (ip_header.get_ip_len() - (ip_header.get_ip_hl() + tcp_header.get_th_off()) * 4)
+        window_size = tcp_header.get_th_win()
 
         pckt_ts = header.getts()[0] + (header.getts()[1] / 1000000)
 
@@ -154,7 +157,8 @@ def packet_parser(pc, connections, initial_pckt_ts):
                                 pckt_ts,
                                 pckt_ts % initial_pckt_ts,
                                 1,
-                                options_size
+                                options_size,
+                                window_size
                               )
             connections[connection_id] = connection_info
         else:
@@ -163,6 +167,7 @@ def packet_parser(pc, connections, initial_pckt_ts):
             update_state_flags(connection_info, SYN, ACK, FIN, RST)
             update_connection_duration(connection_info, pckt_ts, initial_pckt_ts, FIN)
             update_total_data_transfer(connection_info, source, options_size)
+            connection_info.window_size_list.append(window_size)
 
             connections[connection_id] = connection_info
 
@@ -178,6 +183,10 @@ def result_logger(connections):
     sum_pckts = 0
     min_pckts = sys.maxsize
     max_pckts = 0
+    sum_window_size = 0
+    min_window_size = sys.maxsize
+    max_window_size = 0
+    total_windows = 0
     count = 1
 
     print('A) Total number of connections: %i' % len(connections))
@@ -219,6 +228,12 @@ def result_logger(connections):
             min_pckts = min(min_pckts, connection.total_pckts)
             max_pckts = max(max_pckts, connection.total_pckts)
 
+            total_windows += len(connection.window_size_list)
+            for window_size in connection.window_size_list:
+                sum_window_size += window_size
+                min_window_size = min(min_window_size, window_size)
+                max_window_size = max(max_window_size, window_size)
+
         print('++++++++++++++++++++++++++++++++++++++++++++++++')
         print('')
 
@@ -258,9 +273,9 @@ def result_logger(connections):
     print('Maximum number of packets including both send/received: %i' % max_pckts)
     print('')
     
-    print('Minimum receive window size including both send/received:')
-    print('Mean receive window size including both send/received:')
-    print('Maximum receive window size including both send/received:')
+    print('Minimum receive window size including both send/received: %i' % min_window_size)
+    print('Mean receive window size including both send/received: %f' % (sum_window_size / total_windows))
+    print('Maximum receive window size including both send/received: %i' % max_window_size)
     print('')
 
 def main():
