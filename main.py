@@ -269,44 +269,50 @@ def result_logger(connections):
 
     print("B) Connections' details:")
     print('')
-    for key, connection in sorted(connections.iteritems(), key=lambda
-            (connection_id, connection_info): (connection_info.source[1], connection_id)):
-        print_connection_details(connection, count)
+    if connections:
+        for key, connection in sorted(connections.iteritems(), key=lambda
+                (connection_id, connection_info): (connection_info.source[1], connection_id)):
+            print_connection_details(connection, count)
 
-        if connection.state.is_reset:
-            reset_connections += 1
+            if connection.state.is_reset:
+                reset_connections += 1
 
-        if connection.state.SYN and connection.state.FIN == 0:
-            open_connections += 1
+            if connection.state.SYN and connection.state.FIN == 0:
+                open_connections += 1
 
-        if connection.state.is_complete:
-            complete_connections += 1
+            if connection.state.is_complete:
+                complete_connections += 1
 
-            sum_time_dur += connection.duration_s
-            min_time_dur = min(min_time_dur, connection.duration_s)
-            max_time_dur = max(max_time_dur, connection.duration_s)
+                sum_time_dur += connection.duration_s
+                min_time_dur = min(min_time_dur, connection.duration_s)
+                max_time_dur = max(max_time_dur, connection.duration_s)
 
-            sum_packets += connection.total_packets
-            min_packets = min(min_packets, connection.total_packets)
-            max_packets = max(max_packets, connection.total_packets)
+                sum_packets += connection.total_packets
+                min_packets = min(min_packets, connection.total_packets)
+                max_packets = max(max_packets, connection.total_packets)
 
-            total_rtts += len(connection.rtt_list)
-            for rtt in connection.rtt_list:
-                sum_rtt += rtt
-                min_rtt = min(min_rtt, rtt)
-                max_rtt = max(max_rtt, rtt)
+                total_rtts += len(connection.rtt_list)
+                for rtt in connection.rtt_list:
+                    sum_rtt += rtt
+                    min_rtt = min(min_rtt, rtt)
+                    max_rtt = max(max_rtt, rtt)
 
-            total_windows += len(connection.window_size_list)
-            for window_size in connection.window_size_list:
-                sum_window_size += window_size
-                min_window_size = min(min_window_size, window_size)
-                max_window_size = max(max_window_size, window_size)
+                total_windows += len(connection.window_size_list)
+                for window_size in connection.window_size_list:
+                    sum_window_size += window_size
+                    min_window_size = min(min_window_size, window_size)
+                    max_window_size = max(max_window_size, window_size)
 
-        count += 1
+            count += 1
+    else:
+        print('No connections found.')
 
     print('C) General:')
     print('')
-    print_general_details(complete_connections, reset_connections, open_connections)
+    if connections:
+        print_general_details(complete_connections, reset_connections, open_connections)
+    else:
+        print('No connections found.')
 
     print('D) Complete TCP connections:')
     print('')
