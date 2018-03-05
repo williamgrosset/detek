@@ -174,6 +174,9 @@ def result_logger(connections):
     complete_connections = 0
     reset_connections = 0
     connections_open = 0
+    sum_time_dur = 0
+    min_time_dur = sys.maxsize
+    max_time_dur = 0
     count = 1
 
     print('A) Total number of connections: %i' % len(connections))
@@ -207,6 +210,10 @@ def result_logger(connections):
             print('Number of data bytes sent from Destination to Source: %i' % connection.bytes_recv)
             print('Total number of data bytes: %i' % connection.total_bytes)
 
+            sum_time_dur += connection.duration_s
+            min_time_dur = min(min_time_dur, connection.duration_s)
+            max_time_dur = max(max_time_dur, connection.duration_s)
+
         print('++++++++++++++++++++++++++++++++++++++++++++++++')
         print('')
 
@@ -231,9 +238,9 @@ def result_logger(connections):
 
     print('D) Complete TCP connections:')
     print('')
-    print('Minimum time duration:')
-    print('Mean time duration:')
-    print('Maximum time duration:')
+    print('Minimum time duration: %fs' % min_time_dur)
+    print('Mean time duration: %fs' % (sum_time_dur / len(connections)))
+    print('Maximum time duration: %fs' % max_time_dur)
     print('')
 
     print('Minimum RTT value:')
