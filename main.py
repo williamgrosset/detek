@@ -133,9 +133,7 @@ def packet_parser(pc, connections, initial_pckt_ts):
         destination = (ip_header.get_ip_dst(), tcp_header.get_th_dport())
         connection_id = ConnectionId(source, destination)
 
-        options_size = 0
-        for option in tcp_header.get_options():
-            options_size += option.get_size()
+        options_size = (ip_header.get_ip_len() - (ip_header.get_ip_hl() + tcp_header.get_th_off()) * 4)
 
         pckt_ts = header.getts()[0] + (header.getts()[1] / 1000000)
 
