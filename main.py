@@ -214,12 +214,34 @@ def print_connection_details(connection, count):
     print('')
 
 def print_general_details(complete_connections, reset_connections, open_connections):
-    print('C) General:')
-    print('')
     print('Total number of complete TCP connections: %i' % complete_connections)
     print('Number of reset TCP connections: %i' % reset_connections)
     print('Number of TCP connections that were still open when the trace capture ended: %i'
             % open_connections)
+    print('')
+
+def print_time_stats(min, mean, max):
+    print('Minimum time duration: %.10fs' % min)
+    print('Mean time duration: %.10fs' % mean)
+    print('Maximum time duration: %.10fs' % max)
+    print('')
+
+def print_rtt_stats(min, mean, max):
+    print('Minimum RTT value: %.10fs' % min)
+    print('Mean RTT value: %.10fs' % mean)
+    print('Maximum RTT value: %.10fs' % max)
+    print('')
+
+def print_packet_stats(min, mean, max):
+    print('Minimum number of packets including both send/received: %i' % min)
+    print('Mean number of packets including both send/received: %.10f' % mean)
+    print('Maximum number of packets including both send/received: %i' % max)
+    print('')
+    
+def print_receive_window_stats(min, mean, max):
+    print('Minimum receive window size including both send/received: %i' % min)
+    print('Mean receive window size including both send/received: %.10f' % mean)
+    print('Maximum receive window size including both send/received: %i' % max)
     print('')
 
 def result_logger(connections):
@@ -283,29 +305,16 @@ def result_logger(connections):
 
         count += 1
 
+    print('C) General:')
+    print('')
     print_general_details(complete_connections, reset_connections, open_connections)
 
     print('D) Complete TCP connections:')
     print('')
-    print('Minimum time duration: %.10fs' % min_time_dur)
-    print('Mean time duration: %.10fs' % (sum_time_dur / complete_connections))
-    print('Maximum time duration: %.10fs' % max_time_dur)
-    print('')
-
-    print('Minimum RTT value: %.10fs' % min_rtt)
-    print('Mean RTT value: %.10fs' % (sum_rtt / total_rtts))
-    print('Maximum RTT value: %.10fs' % max_rtt)
-    print('')
-
-    print('Minimum number of packets including both send/received: %i' % min_packets)
-    print('Mean number of packets including both send/received: %.10f' % (sum_packets / complete_connections))
-    print('Maximum number of packets including both send/received: %i' % max_packets)
-    print('')
-    
-    print('Minimum receive window size including both send/received: %i' % min_window_size)
-    print('Mean receive window size including both send/received: %.10f' % (sum_window_size / total_windows))
-    print('Maximum receive window size including both send/received: %i' % max_window_size)
-    print('')
+    print_time_stats(min_time_dur, (sum_time_dur / complete_connections), max_time_dur)
+    print_rtt_stats(min_rtt, (sum_rtt / total_rtts), max_rtt)
+    print_packet_stats(min_packets, (sum_packets / complete_connections), max_packets)
+    print_receive_window_stats(min_window_size, (sum_window_size / total_windows), max_window_size)
 
 def main():
     filename = sys.argv[1]
