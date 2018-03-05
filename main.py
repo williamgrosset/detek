@@ -185,6 +185,36 @@ def packet_parser(pc, connections, initial_packet_ts):
 
         packet = pc.next()
 
+def print_connection_details(connection, count):
+    source = connection.source
+    destination = connection.destination
+    status = 'S%sF%s' % (connection.state.SYN, connection.state.FIN)
+    if connection.state.is_reset:
+        status += ' + R'
+
+    print('++++++++++++++++++++++++++++++++++++++++++++++++')
+    print('Connection %i:' % count)
+    print('Source Address: %s' % source[0])
+    print('Destination Address: %s' % destination[0])
+    print('Source Port: %s' % source[1])
+    print('Destination Port: %s' % destination[1])
+    print('Status: %s' % status)
+    if connection.state.is_complete:
+        print('Start Time: %.10fs' % connection.start_rs)
+        print('End Time: %.10fs' % connection.end_rs)
+        print('Duration: %.10fs' % connection.duration_s)
+        print('Number of packets sent from Source to Destination: %i' % connection.packets_sent)
+        print('Number of packets sent from Destination to Source: %i' % connection.packets_recv)
+        print('Total number of packets: %i' % connection.total_packets)
+        print('Number of data bytes sent from Source to Destination: %i' % connection.bytes_sent)
+        print('Number of data bytes sent from Destination to Source: %i' % connection.bytes_recv)
+        print('Total number of data bytes: %i' % connection.total_bytes)
+
+    print('++++++++++++++++++++++++++++++++++++++++++++++++')
+    print('')
+
+    count += 1
+
 def result_logger(connections):
     complete_connections = 0
     reset_connections = 0
@@ -212,30 +242,9 @@ def result_logger(connections):
     print('')
     for key, connection in sorted(connections.iteritems(), key=lambda
             (connection_id, connection_info): (connection_info.source[1], connection_id)):
-        source = connection.source
-        destination = connection.destination
-        status = 'S%sF%s' % (connection.state.SYN, connection.state.FIN)
-        if connection.state.is_reset:
-            status += ' + R'
+        print_connection_details(connection, count)
 
-        print('++++++++++++++++++++++++++++++++++++++++++++++++')
-        print('Connection %i:' % count)
-        print('Source Address: %s' % source[0])
-        print('Destination Address: %s' % destination[0])
-        print('Source Port: %s' % source[1])
-        print('Destination Port: %s' % destination[1])
-        print('Status: %s' % status)
         if connection.state.is_complete:
-            print('Start Time: %.10fs' % connection.start_rs)
-            print('End Time: %.10fs' % connection.end_rs)
-            print('Duration: %.10fs' % connection.duration_s)
-            print('Number of packets sent from Source to Destination: %i' % connection.packets_sent)
-            print('Number of packets sent from Destination to Source: %i' % connection.packets_recv)
-            print('Total number of packets: %i' % connection.total_packets)
-            print('Number of data bytes sent from Source to Destination: %i' % connection.bytes_sent)
-            print('Number of data bytes sent from Destination to Source: %i' % connection.bytes_recv)
-            print('Total number of data bytes: %i' % connection.total_bytes)
-
             sum_time_dur += connection.duration_s
             min_time_dur = min(min_time_dur, connection.duration_s)
             max_time_dur = max(max_time_dur, connection.duration_s)
@@ -255,9 +264,6 @@ def result_logger(connections):
                 sum_window_size += window_size
                 min_window_size = min(min_window_size, window_size)
                 max_window_size = max(max_window_size, window_size)
-
-        print('++++++++++++++++++++++++++++++++++++++++++++++++')
-        print('')
 
         if connection.state.is_complete:
             complete_connections += 1
