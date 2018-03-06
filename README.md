@@ -9,4 +9,4 @@ This project was an assignment for the [Computer Communications and Networks](ht
 ### Usage 
 **Prerequisite**: `Python 2.7.x` (tested with `Python 2.7.10`)
 1. Install [pcapy](https://github.com/CoreSecurity/pcapy) and [impacket](https://github.com/CoreSecurity/impacket).
-2. Run `python main.py <capture-file>`.
+2. Run `python main.py <capture-file>` (see [sample output](https://github.com/williamgrosset/detek/blob/master/sample_output_file.pdf)).
