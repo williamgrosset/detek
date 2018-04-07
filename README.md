@@ -1,6 +1,4 @@
 # detek
-:vertical_traffic_light: TCP traffic analysis.
-
 ![alt text](https://github.com/williamgrosset/detek/blob/master/example.gif "detek")
 
 ## Overview
